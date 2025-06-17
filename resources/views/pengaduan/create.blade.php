@@ -153,6 +153,13 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                 <div>
+                                    <label for="no_telepon_korban" class="block text-sm font-medium text-gray-700">Nomor Telepon Korban</label>
+                                    <input type="tel" name="no_telepon_korban" id="no_telepon_korban" value="{{ old('no_telepon_korban') }}" 
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                                           placeholder="08xxxxxxxxxx" required>
+                                </div>
+
+                                <div>
                                     <label for="jenis_kelamin_korban" class="block text-sm font-medium text-gray-700">Jenis Kelamin Korban</label>
                                     <select name="jenis_kelamin_korban" id="jenis_kelamin_korban" 
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
@@ -161,7 +168,9 @@
                                         <option value="P" {{ old('jenis_kelamin_korban') == 'P' ? 'selected' : '' }}>Perempuan</option>
                                     </select>
                                 </div>
+                            </div>
 
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                 <div>
                                     <label for="hubungan_dengan_korban" class="block text-sm font-medium text-gray-700">Hubungan dengan Korban</label>
                                     <select name="hubungan_dengan_korban" id="hubungan_dengan_korban" 

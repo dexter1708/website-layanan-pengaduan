@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengaduan;
+use App\Models\HistoriTracking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,7 +32,7 @@ class TrackingController extends Controller
     public function show($id)
     {
         $user = Auth::user();
-        $pengaduan = Pengaduan::with(['pelapor.alamat', 'korban'])
+        $pengaduan = Pengaduan::with(['pelapor.alamat', 'korban', 'historiTracking.changedByUser'])
             ->findOrFail($id);
 
         // Pastikan user hanya bisa melihat pengaduan miliknya (jika role pelapor)
@@ -67,8 +68,20 @@ class TrackingController extends Controller
         ]);
 
         $pengaduan = Pengaduan::findOrFail($id);
+        $oldStatus = $pengaduan->status;
+        
+        // Update status pengaduan
         $pengaduan->status = $request->status;
         $pengaduan->save();
+
+        // Simpan riwayat perubahan status
+        HistoriTracking::create([
+            'pengaduan_id' => $pengaduan->id,
+            'status_sebelum' => $oldStatus,
+            'status_sesudah' => $request->status,
+            'changed_by_user_id' => Auth::id(),
+            'keterangan' => $request->keterangan
+        ]);
 
         return redirect()->route('tracking.index')->with('success', 'Status pengaduan berhasil diperbarui');
     }

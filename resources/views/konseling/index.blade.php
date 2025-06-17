@@ -13,6 +13,10 @@
                 <a href="{{ route('staff.konseling.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Buat Jadwal Konseling
                 </a>
+                @else
+                <a href="{{ route('user.konseling.request') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    {{ __('Ajukan Konseling') }}
+                </a>
                 @endif
             @endauth
         </div>
@@ -40,6 +44,7 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Pengaduan</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Korban</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis Layanan</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Konselor</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jadwal</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tempat</th>
@@ -52,8 +57,9 @@
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $konseling->pengaduan_id }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $konseling->nama_korban }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $konseling->jenis_layanan ?? 'Belum ditentukan' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $konseling->nama_konselor }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $konseling->jadwal_konseling->format('d/m/Y H:i') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $konseling->getJadwalKonselingShort() }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $konseling->tempat_konseling }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -61,7 +67,7 @@
                                                 @elseif($konseling->konfirmasi === 'tolak') bg-red-100 text-red-800
                                                 @else bg-yellow-100 text-yellow-800
                                                 @endif">
-                                                {{ ucfirst($konseling->konfirmasi) }}
+                                                {{ $konseling->getStatusLabel() }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -76,7 +82,7 @@
                                                         <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
                                                     </form>
                                                 @else
-                                                    @if($konseling->konfirmasi === 'menunggu')
+                                                    @if($konseling->konfirmasi === 'menunggu' || $konseling->konfirmasi === 'menunggu_konfirmasi_user')
                                                         <form action="{{ route('konseling.update-konfirmasi', $konseling->id) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('PUT')
@@ -96,7 +102,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                                        <td colspan="8" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
                                             Tidak ada jadwal konseling
                                         </td>
                                     </tr>

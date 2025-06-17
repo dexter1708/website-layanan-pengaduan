@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pendampingan', function (Blueprint $table) {
-            $table->string('konfirmasi')->after('tanggal_pendampingan');
-            // Add any other columns or modifications you need here
-        });
+        // Migration ini tidak diperlukan karena kolom konfirmasi sudah ada di migration awal
+        // Schema::table('pendampingan', function (Blueprint $table) {
+        //     $table->string('konfirmasi')->after('tanggal_pendampingan');
+        // });
     }
 
     public function down(): void
     {
-        Schema::table('pendampingan', function (Blueprint $table) {
-            //
-        });
+        // Schema::table('pendampingan', function (Blueprint $table) {
+        //     //
+        // });
     }
 };

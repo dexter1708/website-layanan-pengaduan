@@ -27,9 +27,10 @@
                 <td>{{ $pengaduan->korban && $pengaduan->korban->count() > 0 ? $pengaduan->korban->first()->nama : '-' }}</td>
                 <td>{{ ucfirst(str_replace('_', ' ', $pengaduan->status)) }}</td>
                 <td>
-                    <a href="{{ route('tracking.show', $pengaduan->id) }}">Detail</a>
+                    <a href="{{ route('pengaduan.show', $pengaduan->id) }}">Detail Pengaduan</a>
+                    <a href="{{ route('tracking.show', $pengaduan->id) }}">Tracking</a>
                     @if(Auth::user()->role !== 'pelapor')
-                        <a href="{{ route('tracking.edit', $pengaduan->id) }}">Update Status</a>
+                        <a href="{{ route('staff.tracking.edit', $pengaduan->id) }}">Update Status</a>
                     @endif
                 </td>
             </tr>

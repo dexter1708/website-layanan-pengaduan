@@ -16,7 +16,7 @@ class StaffSeeder extends Seeder
                 'email' => 'staff1@example.com',
                 'password' => Hash::make('password123'),
                 'nik' => '1234567890123456',
-                'foto_ktp' => 'default.jpg',
+                'no_telepon' => '081234567890',
                 'role' => 'staff',
             ],
             [
@@ -24,7 +24,7 @@ class StaffSeeder extends Seeder
                 'email' => 'staff2@example.com',
                 'password' => Hash::make('password123'),
                 'nik' => '2345678901234567',
-                'foto_ktp' => 'default.jpg',
+                'no_telepon' => '081234567891',
                 'role' => 'staff',
             ],
             [
@@ -32,7 +32,7 @@ class StaffSeeder extends Seeder
                 'email' => 'staff3@example.com',
                 'password' => Hash::make('password123'),
                 'nik' => '3456789012345678',
-                'foto_ktp' => 'default.jpg',
+                'no_telepon' => '081234567892',
                 'role' => 'staff',
             ],
         ];

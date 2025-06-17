@@ -9,8 +9,6 @@ class WilayahSeeder extends Seeder
 {
     public function run()
     {
-       
-
         // Kecamatan Andir
         $this->insertWilayah(1, 1, ['Campaka', 'Ciroyom', 'Dunguscariang', 'Garuda', 'Kebonjeruk', 'Maleber']);
 

@@ -65,6 +65,8 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'staff' => \App\Http\Middleware\StaffMiddleware::class,
         'super_admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
+        'pelapor' => \App\Http\Middleware\PelaporOrUserMiddleware::class,
+        'user' => \App\Http\Middleware\PelaporOrUserMiddleware::class,
     ];
 
     /**
@@ -87,5 +89,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'staff' => \App\Http\Middleware\StaffMiddleware::class,
         'super_admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
+        'pelapor' => \App\Http\Middleware\PelaporOrUserMiddleware::class,
+        'user' => \App\Http\Middleware\PelaporOrUserMiddleware::class,
     ];
 } 

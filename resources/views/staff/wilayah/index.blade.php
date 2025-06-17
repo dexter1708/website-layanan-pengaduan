@@ -9,6 +9,20 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    <!-- Informasi Hierarki -->
+                    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h3 class="text-lg font-semibold text-blue-800 mb-2">Informasi Hierarki Wilayah:</h3>
+                        <ul class="text-blue-700 space-y-1">
+                            <li>• <strong>Kota:</strong> Menampilkan semua kota yang ada</li>
+                            <li>• <strong>Kecamatan:</strong> Menampilkan semua kecamatan yang ada</li>
+                            <li>• <strong>Desa:</strong> Menampilkan semua desa yang ada</li>
+                        </ul>
+                        <p class="text-blue-600 text-sm mt-2">
+                            <strong>Fitur Tambah:</strong> Anda dapat menambahkan Kota baru (otomatis buat Kecamatan & Desa), 
+                            Kecamatan baru (otomatis buat Desa), atau Desa baru ke Kecamatan yang sudah ada.
+                        </p>
+                    </div>
+
                     @if (session('success'))
                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
                             <span class="block sm:inline">{{ session('success') }}</span>
@@ -54,12 +68,12 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white">
-                                    @foreach($kota as $item)
+                                    @foreach($kotas as $item)
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->kota_nama }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
-                                                <a href="{{ route('staff.wilayah.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                                <form action="{{ route('staff.wilayah.destroy', $item) }}" method="POST" class="inline">
+                                                <a href="{{ route('staff.wilayah.edit', ['type' => 'kota', 'id' => $item->kota_id]) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                                <form action="{{ route('staff.wilayah.destroy', ['type' => 'kota', 'id' => $item->kota_id]) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Apakah Anda yakin ingin menghapus kota ini?')">Hapus</button>
@@ -84,13 +98,13 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white">
-                                    @foreach($kecamatan as $item)
+                                    @foreach($kecamatans as $item)
                                         <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->kota->kota_nama ?? '-' }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->kota_nama }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->kecamatan_nama }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
-                                                <a href="{{ route('staff.wilayah.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                                <form action="{{ route('staff.wilayah.destroy', $item) }}" method="POST" class="inline">
+                                                <a href="{{ route('staff.wilayah.edit', ['type' => 'kecamatan', 'id' => $item->kecamatan_id]) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                                <form action="{{ route('staff.wilayah.destroy', ['type' => 'kecamatan', 'id' => $item->kecamatan_id]) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Apakah Anda yakin ingin menghapus kecamatan ini?')">Hapus</button>
@@ -116,14 +130,14 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white">
-                                    @foreach($desa as $item)
+                                    @foreach($desas as $item)
                                         <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->kota->kota_nama ?? '-' }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->kecamatan->kecamatan_nama ?? '-' }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->kota_nama }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->kecamatan_nama }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->desa_nama }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
-                                                <a href="{{ route('staff.wilayah.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                                <form action="{{ route('staff.wilayah.destroy', $item) }}" method="POST" class="inline">
+                                                <a href="{{ route('staff.wilayah.edit', ['type' => 'desa', 'id' => $item->desa_id]) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                                <form action="{{ route('staff.wilayah.destroy', ['type' => 'desa', 'id' => $item->desa_id]) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Apakah Anda yakin ingin menghapus desa ini?')">Hapus</button>

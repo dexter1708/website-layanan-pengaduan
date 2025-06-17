@@ -88,6 +88,33 @@
             display: inline;
             margin-right: 20px;
         }
+        .history-card {
+            transition: transform 0.2s ease-in-out;
+        }
+        .history-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -103,6 +130,89 @@
                 </ul>
             </div>
         @endif
+
+        {{-- Riwayat Pengaduan Sebelumnya --}}
+        @if($riwayatPengaduan->count() > 0)
+            <div class="section" style="background-color: #f8f9fa; border-left: 4px solid #4CAF50;">
+                <h3 style="color: #4CAF50; margin-bottom: 15px;">
+                    📋 Riwayat Pengaduan Anda
+                </h3>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Berikut adalah daftar pengaduan yang pernah Anda lakukan sebelumnya:
+                </p>
+                
+                @foreach($riwayatPengaduan as $pengaduan)
+                    <div class="history-card" style="border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 15px; background: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="margin: 0; color: #333;">
+                                Pengaduan #{{ $pengaduan->id }} - {{ ucfirst($pengaduan->jenis_kasus) }}
+                            </h4>
+                            <span class="status-badge" style="
+                                @if($pengaduan->status == 'menunggu') background-color: #fff3cd; color: #856404;
+                                @elseif($pengaduan->status == 'diproses') background-color: #cce5ff; color: #004085;
+                                @elseif($pengaduan->status == 'selesai') background-color: #d4edda; color: #155724;
+                                @else background-color: #f8d7da; color: #721c24;
+                                @endif">
+                                {{ ucfirst($pengaduan->status) }}
+                            </span>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <div>
+                                <strong>Tanggal Kejadian:</strong> {{ \Carbon\Carbon::parse($pengaduan->tanggal_kejadian)->format('d/m/Y') }}
+                            </div>
+                            <div>
+                                <strong>Tanggal Pengaduan:</strong> {{ $pengaduan->created_at->format('d/m/Y H:i') }}
+                            </div>
+                            <div>
+                                <strong>Tempat:</strong> {{ $pengaduan->tempat_kejadian }}
+                            </div>
+                            <div>
+                                <strong>Bentuk Kekerasan:</strong> {{ $pengaduan->bentuk_kekerasan }}
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <strong>Kronologi:</strong>
+                            <p style="margin: 5px 0; color: #666; font-style: italic;">
+                                {{ Str::limit($pengaduan->kronologi, 150) }}
+                            </p>
+                        </div>
+                        
+                        @if($pengaduan->korban->count() > 0)
+                            <div style="margin-bottom: 10px;">
+                                <strong>Korban:</strong>
+                                @foreach($pengaduan->korban as $korban)
+                                    <span style="background: #e9ecef; padding: 2px 6px; border-radius: 3px; margin-right: 5px; font-size: 12px;">
+                                        {{ $korban->nama }} ({{ $korban->usia }} tahun)
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
+                        
+                        <div style="text-align: right;">
+                            <a href="{{ route('pengaduan.show', $pengaduan->id) }}" 
+                               style="color: #4CAF50; text-decoration: none; font-size: 14px;">
+                                👁️ Lihat Detail
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="{{ route('pengaduan.riwayat') }}" class="btn-secondary">
+                        📊 Lihat Semua Riwayat Pengaduan
+                    </a>
+                </div>
+            </div>
+            
+            <hr style="margin: 30px 0; border: none; border-top: 2px solid #4CAF50;">
+        @endif
+
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #4CAF50; margin-bottom: 10px;">📝 Buat Pengaduan Baru</h2>
+            <p style="color: #666; font-size: 16px;">Silakan isi form di bawah ini untuk mengajukan pengaduan baru</p>
+        </div>
 
         <form action="{{ route('pengaduan.store') }}" method="POST">
             @csrf
@@ -212,6 +322,12 @@
                 <div class="form-group">
                     <label>Usia:</label>
                     <input type="number" name="korban[usia]" value="{{ old('korban.usia') }}" required min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Nomor Telepon:</label>
+                    <input type="tel" name="korban[no_telepon]" value="{{ old('korban.no_telepon') }}" 
+                           placeholder="08xxxxxxxxxx" required>
                 </div>
 
                 <div class="form-group">
@@ -346,7 +462,7 @@
                                 $(kecamatanSelect).empty();
                                 $(kecamatanSelect).append('<option value="">-- Pilih Kecamatan --</option>');
                                 $.each(data, function(key, value) {
-                                    $(kecamatanSelect).append('<option value="'+ value.id +'">'+ value.nama +'</option>');
+                                    $(kecamatanSelect).append('<option value="'+ value.id +'">' + value.kecamatan_nama +'</option>');
                                 });
                                 $(desaSelect).empty();
                                 $(desaSelect).append('<option value="">-- Pilih Desa --</option>');
@@ -373,7 +489,7 @@
                                 $(desaSelect).empty();
                                 $(desaSelect).append('<option value="">-- Pilih Desa --</option>');
                                 $.each(data, function(key, value) {
-                                    $(desaSelect).append('<option value="'+ value.id +'">'+ value.nama +'</option>');
+                                    $(desaSelect).append('<option value="'+ value.id +'">' + value.desa_nama +'</option>');
                                 });
                             },
                             error: function() {

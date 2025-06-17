@@ -7,7 +7,7 @@
     <h1>Update Status Pengaduan #{{ $pengaduan->id }}</h1>
     <a href="{{ route('tracking.index') }}">Kembali</a>
 
-    <form action="{{ route('tracking.update', $pengaduan->id) }}" method="POST">
+    <form action="{{ route('staff.tracking.update-status', $pengaduan->id) }}" method="POST">
         @csrf
         @method('PUT')
 

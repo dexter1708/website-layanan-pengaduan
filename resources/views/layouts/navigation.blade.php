@@ -16,12 +16,29 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('pendampingan.index')" :active="request()->routeIs('pendampingan.*')">
+                        {{ __('Pendampingan') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('konseling.index')" :active="request()->routeIs('konseling.*')">
+                        {{ __('Konseling') }}
+                    </x-nav-link>
+
                     @if(Auth::user()->role === 'super_admin')
                         <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
                             {{ __('Manajemen Staff') }}
                         </x-nav-link>
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
                             {{ __('Manajemen Pelapor') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if(Auth::user()->role === 'staff')
+                        <x-nav-link :href="route('staff.instruktur.index')" :active="request()->routeIs('staff.instruktur.*')">
+                            {{ __('Kelola Instruktur') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('staff.layanan.index')" :active="request()->routeIs('staff.layanan.*')">
+                            {{ __('Kelola Layanan') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -80,12 +97,29 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
+            <x-responsive-nav-link :href="route('pendampingan.index')" :active="request()->routeIs('pendampingan.*')">
+                {{ __('Pendampingan') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('konseling.index')" :active="request()->routeIs('konseling.*')">
+                {{ __('Konseling') }}
+            </x-responsive-nav-link>
+
             @if(Auth::user()->role === 'super_admin')
                 <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
                     {{ __('Manajemen Staff') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
                     {{ __('Manajemen Pelapor') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(Auth::user()->role === 'staff')
+                <x-responsive-nav-link :href="route('staff.instruktur.index')" :active="request()->routeIs('staff.instruktur.*')">
+                    {{ __('Kelola Instruktur') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('staff.layanan.index')" :active="request()->routeIs('staff.layanan.*')">
+                    {{ __('Kelola Layanan') }}
                 </x-responsive-nav-link>
             @endif
         </div>

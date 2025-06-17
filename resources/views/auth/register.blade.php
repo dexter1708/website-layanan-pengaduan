@@ -2,7 +2,7 @@
     <!-- Add jQuery before the form -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
-    <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('register') }}">
         @csrf
 
         <!-- Name -->
@@ -24,6 +24,13 @@
             <x-input-label for="nik" :value="__('NIK')" />
             <x-text-input id="nik" class="block mt-1 w-full" type="text" name="nik" :value="old('nik')" required />
             <x-input-error :messages="$errors->get('nik')" class="mt-2" />
+        </div>
+
+        <!-- Nomor Telepon -->
+        <div class="mt-4">
+            <x-input-label for="no_telepon" :value="__('Nomor Telepon')" />
+            <x-text-input id="no_telepon" class="block mt-1 w-full" type="tel" name="no_telepon" :value="old('no_telepon')" required placeholder="08xxxxxxxxxx" />
+            <x-input-error :messages="$errors->get('no_telepon')" class="mt-2" />
         </div>
 
         <!-- Kota -->
@@ -70,13 +77,6 @@
             <x-input-error :messages="$errors->get('RW')" class="mt-2" />
         </div>
 
-        <!-- Foto KTP -->
-        <div class="mt-4">
-            <x-input-label for="foto_ktp" :value="__('Foto KTP')" />
-            <input id="foto_ktp" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="file" name="foto_ktp" />
-            <x-input-error :messages="$errors->get('foto_ktp')" class="mt-2" />
-        </div>
-
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
@@ -115,7 +115,7 @@
                             $('#kecamatan').empty();
                             $('#kecamatan').append('<option value="">--Pilih Kecamatan--</option>');
                             $.each(data, function(key, value) {
-                                $('#kecamatan').append('<option value="'+ value.id +'">'+ value.nama +'</option>');
+                                $('#kecamatan').append('<option value="'+ value.id +'">' + value.kecamatan_nama +'</option>');
                             });
                             // Reset desa dropdown
                             $('#desa').empty();
@@ -145,7 +145,7 @@
                             $('#desa').empty();
                             $('#desa').append('<option value="">--Pilih Desa--</option>');
                             $.each(data, function(key, value) {
-                                $('#desa').append('<option value="'+ value.id +'">'+ value.nama +'</option>');
+                                $('#desa').append('<option value="'+ value.id +'">' + value.desa_nama +'</option>');
                             });
                         },
                         error: function() {

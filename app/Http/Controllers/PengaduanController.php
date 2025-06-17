@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Wilayah;
 use App\Models\Pengaduan;
 use App\Models\Pelapor;
+use App\Models\HistoriTracking;
 use App\Models\BentukKekerasan;
 use App\Models\Pekerjaan;
 use Illuminate\Http\Request;
@@ -16,6 +17,15 @@ class PengaduanController extends Controller
     // Menampilkan form pengaduan dan memilih kota
     public function create()
     {
+        $user = Auth::user();
+        
+        // Ambil riwayat pengaduan user (maksimal 5 terbaru)
+        $riwayatPengaduan = Pengaduan::with(['korban', 'pelaku', 'historiTracking'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+        
         // Ambil data kota untuk dropdown
         $kotas = Wilayah::select('kota_id', 'kota_nama')->distinct()->get();
         
@@ -23,7 +33,45 @@ class PengaduanController extends Controller
         $bentukKekerasan = BentukKekerasan::all();
         $pekerjaan = Pekerjaan::all();
         
-        return view('pelapor.pengaduan', compact('kotas', 'bentukKekerasan', 'pekerjaan'));
+        return view('pelapor.pengaduan', compact('kotas', 'bentukKekerasan', 'pekerjaan', 'riwayatPengaduan'));
+    }
+    
+    // Menampilkan detail pengaduan
+    public function show($id)
+    {
+        $user = Auth::user();
+        $pengaduan = Pengaduan::with(['pelapor', 'korban', 'pelaku', 'historiTracking.changedByUser', 'user.alamat'])
+            ->findOrFail($id);
+
+        // Pastikan user hanya bisa melihat pengaduan miliknya (jika role pelapor)
+        if ($user->role === 'pelapor' && $pengaduan->user_id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('pengaduan.show', compact('pengaduan'));
+    }
+    
+    // Menampilkan riwayat pengaduan user
+    public function riwayat(Request $request)
+    {
+        $user = Auth::user();
+        
+        $query = Pengaduan::with(['korban', 'pelaku', 'historiTracking'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc');
+            
+        // Filter berdasarkan tanggal jika ada
+        if ($request->filled('dari')) {
+            $query->where('created_at', '>=', $request->dari);
+        }
+        
+        if ($request->filled('sampai')) {
+            $query->where('created_at', '<=', $request->sampai . ' 23:59:59');
+        }
+        
+        $pengaduans = $query->get();
+        
+        return view('pelapor.riwayat', compact('pengaduans'));
     }
     
     // Menyimpan data pengaduan dan pelapor
@@ -45,6 +93,7 @@ class PengaduanController extends Controller
             'korban.jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'korban.disabilitas' => 'required|in:Ya,Tidak',
             'korban.usia' => 'required|integer|min:0',
+            'korban.no_telepon' => 'required|string|regex:/^08[0-9]{8,11}$/',
             'korban.pendidikan' => 'required|in:Tidak Sekolah,SD,SMP,SMA,D3,S1,S2,S3',
             'korban.status_perkawinan' => 'required|in:Belum Kawin,Kawin,Cerai Hidup,Cerai Mati',
             'korban.pekerjaan' => 'required|exists:pekerjaan,pekerjaan',
@@ -78,6 +127,8 @@ class PengaduanController extends Controller
             'korban.usia.required' => 'Usia korban harus diisi.',
             'korban.usia.integer' => 'Usia korban harus berupa angka.',
             'korban.usia.min' => 'Usia korban tidak boleh kurang dari 0.',
+            'korban.no_telepon.required' => 'No telepon korban harus diisi.',
+            'korban.no_telepon.regex' => 'Format no telepon korban tidak valid.',
             'korban.pendidikan.required' => 'Pendidikan korban harus dipilih.',
             'korban.status_perkawinan.required' => 'Status perkawinan korban harus dipilih.',
             'korban.pekerjaan.required' => 'Pekerjaan korban harus dipilih.',
@@ -125,6 +176,15 @@ class PengaduanController extends Controller
                 'status' => 'menunggu',
             ]);
 
+            // Simpan riwayat status awal
+            HistoriTracking::create([
+                'pengaduan_id' => $pengaduan->id,
+                'status_sebelum' => null,
+                'status_sesudah' => 'menunggu',
+                'changed_by_user_id' => $user->id,
+                'keterangan' => 'Pengaduan baru diajukan'
+            ]);
+
             // Create pelapor data from user
             $pelapor = Pelapor::create([
                 'pengaduan_id' => $pengaduan->id,
@@ -145,7 +205,7 @@ class PengaduanController extends Controller
             $pelaku = $pengaduan->pelaku()->create($request->pelaku);
 
             DB::commit();
-            return redirect()->route('dashboard')->with('success', 'Pengaduan berhasil diajukan!');
+            return redirect()->route('pengaduan.show', $pengaduan->id)->with('success', 'Pengaduan berhasil diajukan! Silakan lihat detail pengaduan Anda di bawah ini.');
 
         } catch (\Exception $e) {
             DB::rollback();

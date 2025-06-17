@@ -53,4 +53,9 @@ class Pengaduan extends Model
     {
         return $this->hasMany(Konseling::class);
     }
+
+    public function historiTracking()
+    {
+        return $this->hasMany(HistoriTracking::class)->orderBy('created_at', 'desc');
+    }
 }

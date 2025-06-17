@@ -108,7 +108,7 @@ class UserManagementController extends Controller
     public function userShow($id)
     {
         $user = User::where('role', 'pelapor')
-            ->with(['alamat', 'pengaduans'])
+            ->with(['alamat'])
             ->findOrFail($id);
         return view('user-management.users.show', compact('user'));
     }

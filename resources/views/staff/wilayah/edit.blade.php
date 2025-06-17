@@ -9,76 +9,56 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form action="{{ route('staff.wilayah.update', $wilayah) }}" method="POST">
+                    @if (session('error'))
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <span class="block sm:inline">{{ session('error') }}</span>
+                        </div>
+                    @endif
+
+                    <!-- Informasi Wilayah yang Diedit -->
+                    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h3 class="text-lg font-semibold text-blue-800 mb-2">Informasi Wilayah:</h3>
+                        @if($tipe === 'kota')
+                            <p class="text-blue-700">Anda sedang mengedit <strong>Kota</strong></p>
+                        @elseif($tipe === 'kecamatan')
+                            <p class="text-blue-700">Anda sedang mengedit <strong>Kecamatan</strong> di Kota: <strong>{{ $wilayah->kota_nama ?? 'N/A' }}</strong></p>
+                        @elseif($tipe === 'desa')
+                            <p class="text-blue-700">Anda sedang mengedit <strong>Desa</strong> di Kecamatan: <strong>{{ $wilayah->kecamatan_nama ?? 'N/A' }}</strong>, Kota: <strong>{{ $wilayah->kota_nama ?? 'N/A' }}</strong></p>
+                        @else
+                            <p class="text-red-700">Tipe wilayah tidak valid</p>
+                        @endif
+                    </div>
+
+                    @if($tipe && in_array($tipe, ['kota', 'kecamatan', 'desa']))
+                    <form action="{{ route('staff.wilayah.update', $id) }}" method="POST">
                         @csrf
                         @method('PUT')
 
-                        <input type="hidden" name="type" value="{{ $wilayah->type }}">
-
-                        @if($wilayah->type === 'kota')
+                        @if($tipe === 'kota')
                             <div class="mb-4">
-                                <label for="kota_nama" class="block text-sm font-medium text-gray-700">Nama Kota</label>
-                                <input type="text" name="kota_nama" id="kota_nama" value="{{ old('kota_nama', $wilayah->kota_nama) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                @error('kota_nama')
+                                <label for="nama_kota" class="block text-sm font-medium text-gray-700">Nama Kota</label>
+                                <input type="text" name="nama" id="nama_kota" value="{{ old('nama', $wilayah->kota_nama ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                @error('nama')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
                         @endif
 
-                        @if($wilayah->type === 'kecamatan')
+                        @if($tipe === 'kecamatan')
                             <div class="mb-4">
-                                <label for="kota_id" class="block text-sm font-medium text-gray-700">Kota</label>
-                                <select name="kota_id" id="kota_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                    <option value="">Pilih Kota</option>
-                                    @foreach($kota as $item)
-                                        <option value="{{ $item->id }}" {{ old('kota_id', $wilayah->kota_id) == $item->id ? 'selected' : '' }}>{{ $item->kota_nama }}</option>
-                                    @endforeach
-                                </select>
-                                @error('kota_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="kecamatan_nama" class="block text-sm font-medium text-gray-700">Nama Kecamatan</label>
-                                <input type="text" name="kecamatan_nama" id="kecamatan_nama" value="{{ old('kecamatan_nama', $wilayah->kecamatan_nama) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                @error('kecamatan_nama')
+                                <label for="nama_kecamatan" class="block text-sm font-medium text-gray-700">Nama Kecamatan</label>
+                                <input type="text" name="nama" id="nama_kecamatan" value="{{ old('nama', $wilayah->kecamatan_nama ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                @error('nama')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
                         @endif
 
-                        @if($wilayah->type === 'desa')
+                        @if($tipe === 'desa')
                             <div class="mb-4">
-                                <label for="kota_id" class="block text-sm font-medium text-gray-700">Kota</label>
-                                <select name="kota_id" id="kota_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required onchange="loadKecamatan()">
-                                    <option value="">Pilih Kota</option>
-                                    @foreach($kota as $item)
-                                        <option value="{{ $item->id }}" {{ old('kota_id', $wilayah->kota_id) == $item->id ? 'selected' : '' }}>{{ $item->kota_nama }}</option>
-                                    @endforeach
-                                </select>
-                                @error('kota_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="kecamatan_id" class="block text-sm font-medium text-gray-700">Kecamatan</label>
-                                <select name="kecamatan_id" id="kecamatan_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                    <option value="">Pilih Kecamatan</option>
-                                    @foreach($kecamatan as $item)
-                                        <option value="{{ $item->id }}" {{ old('kecamatan_id', $wilayah->kecamatan_id) == $item->id ? 'selected' : '' }}>{{ $item->kecamatan_nama }}</option>
-                                    @endforeach
-                                </select>
-                                @error('kecamatan_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="desa_nama" class="block text-sm font-medium text-gray-700">Nama Desa</label>
-                                <input type="text" name="desa_nama" id="desa_nama" value="{{ old('desa_nama', $wilayah->desa_nama) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                @error('desa_nama')
+                                <label for="nama_desa" class="block text-sm font-medium text-gray-700">Nama Desa</label>
+                                <input type="text" name="nama" id="nama_desa" value="{{ old('nama', $wilayah->desa_nama ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                @error('nama')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -93,49 +73,18 @@
                             </button>
                         </div>
                     </form>
+                    @else
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <span class="block sm:inline">Tipe wilayah tidak valid atau tidak ditemukan.</span>
+                        </div>
+                        <div class="flex items-center justify-end mt-4">
+                            <a href="{{ route('staff.wilayah.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                                Kembali
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-
-    @if($wilayah->type === 'desa')
-    @push('scripts')
-    <script>
-        function loadKecamatan() {
-            const kotaId = document.getElementById('kota_id').value;
-            const kecamatanSelect = document.getElementById('kecamatan_id');
-            
-            // Clear current options
-            kecamatanSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
-
-            if (kotaId) {
-                // Fetch kecamatan data
-                fetch(`/staff/wilayah/kecamatan/${kotaId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(kecamatan => {
-                            const option = document.createElement('option');
-                            option.value = kecamatan.id;
-                            option.textContent = kecamatan.kecamatan_nama;
-                            kecamatanSelect.appendChild(option);
-                        });
-
-                        // If there's an old value, select it
-                        const oldKecamatanId = '{{ old('kecamatan_id', $wilayah->kecamatan_id) }}';
-                        if (oldKecamatanId) {
-                            kecamatanSelect.value = oldKecamatanId;
-                        }
-                    });
-            }
-        }
-
-        // Load kecamatan on page load if kota is selected
-        document.addEventListener('DOMContentLoaded', function() {
-            if (document.getElementById('kota_id').value) {
-                loadKecamatan();
-            }
-        });
-    </script>
-    @endpush
-    @endif
 </x-app-layout> 

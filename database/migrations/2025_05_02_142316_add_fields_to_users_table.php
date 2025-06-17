@@ -13,7 +13,6 @@ return new class extends Migration
     {
     Schema::table('users', function (Blueprint $table) {
         $table->string('nik')->unique();
-        $table->string('foto_ktp')->nullable(); 
         $table->enum('role', ['pelapor', 'staff', 'super_admin'])->default('pelapor');
     });
     }

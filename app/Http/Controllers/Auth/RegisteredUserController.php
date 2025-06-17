@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'nik' => ['required', 'string', 'unique:users,nik'],
-            'foto_ktp' => ['nullable', 'image', 'max:2048'],
+            'no_telepon' => ['required', 'string', 'regex:/^08[0-9]{8,11}$/', 'unique:users,no_telepon'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'kota' => ['required', 'exists:wilayah,kota_id'],
             'kecamatan' => ['required', 'exists:wilayah,kecamatan_id'],  // Validasi kecamatan berdasarkan kota
@@ -48,19 +48,13 @@ class RegisteredUserController extends Controller
         ->where('desa_id', $request->desa)
         ->firstOrFail();
 ;
-        // Menyimpan foto KTP jika ada
-        $fotoKtpPath = null;
-        if ($request->hasFile('foto_ktp')) {
-            $fotoKtpPath = $request->file('foto_ktp')->store('ktp', 'public');
-        }
-
         
         // Simpan user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'nik' => $request->nik,
-            'foto_ktp' => $fotoKtpPath,
+            'no_telepon' => $request->no_telepon,
             'password' => Hash::make($request->password),
             'role' => 'pelapor',
         ]);
