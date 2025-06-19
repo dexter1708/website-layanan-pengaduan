@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        schema::create('konseling', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('pengaduan_id')->constrained('pengaduan')->onDelete('cascade');
+            $table->foreignId('korban_id')->constrained('korban')->onDelete('cascade');
+            $table->string('nama_korban');
+            $table->string('nama_konselor');
+            $table->dateTime('jadwal_konseling');
+            $table->string('tempat_konseling');
+            $table->string('konfirmasi')->default('menunggu');
+            $table->timestamps();
+
+            // Foreign key constraints
+           
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('konseling');
+    }
+};
