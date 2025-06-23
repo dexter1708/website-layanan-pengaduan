@@ -335,40 +335,26 @@ class WilayahController extends Controller
     // API endpoints for dynamic dropdowns
     public function getKecamatan($kotaId)
     {
-        // Ambil pasangan unik kecamatan_id dan kecamatan_nama untuk kota yang dipilih
-        // Hanya kecamatan yang memiliki desa (kecamatan yang aktif)
-        $kecamatan = Wilayah::where('kota_id', $kotaId)
-            ->select('kecamatan_id', 'kecamatan_nama')
-            ->whereNotNull('kecamatan_nama') // Pastikan nama kecamatan tidak null
-            ->whereNotNull('desa_nama') // Hanya kecamatan yang memiliki desa
-            ->groupBy('kecamatan_id', 'kecamatan_nama') // Kelompokkan untuk mendapatkan pasangan unik
-            ->orderBy('kecamatan_nama') // Urutkan untuk tampilan yang lebih baik
-            ->get();
+        $kecamatans = Wilayah::where('kota_id', $kotaId)
+                            ->select('kecamatan_id', 'kecamatan_nama')
+                            ->whereNotNull('kecamatan_nama')
+                            ->groupBy('kecamatan_id', 'kecamatan_nama')
+                            ->orderBy('kecamatan_nama')
+                            ->get();
 
-        // Format data agar sesuai dengan harapan frontend (JavaScript mengharapkan 'id' dan 'kecamatan_nama')
-        $formattedKecamatan = $kecamatan->map(function ($item) {
-            return [
-                'id' => $item->kecamatan_id,
-                'kecamatan_nama' => $item->kecamatan_nama,
-            ];
-        });
-
-        return response()->json($formattedKecamatan);
+        return response()->json($kecamatans);
     }
 
     public function getDesa($kecamatanId)
     {
-        // Ambil id (primary key) dan desa_nama yang unik untuk kecamatan yang dipilih
-        // Diasumsikan 'id' adalah identifier unik untuk setiap entri desa di tabel ini
-        $desa = Wilayah::where('kecamatan_id', $kecamatanId)
-            ->select('id', 'desa_nama')
-            ->whereNotNull('desa_nama') // Pastikan nama desa tidak null
-            ->groupBy('id', 'desa_nama') // Kelompokkan untuk mendapatkan pasangan unik (id, desa_nama)
-            ->orderBy('desa_nama') // Urutkan untuk tampilan yang lebih baik
-            ->get();
+        $desas = Wilayah::where('kecamatan_id', $kecamatanId)
+                        ->select('desa_id', 'desa_nama')
+                        ->whereNotNull('desa_nama')
+                        ->groupBy('desa_id', 'desa_nama')
+                        ->orderBy('desa_nama')
+                        ->get();
 
-        // Tidak perlu memetakan 'id' karena kita sudah memilih kolom 'id' secara langsung.
-        return response()->json($desa);
+        return response()->json($desas);
     }
 
     /**
@@ -376,24 +362,6 @@ class WilayahController extends Controller
      */
     private function findWilayahById($id)
     {
-    
-        $desa = Wilayah::where('desa_id', $id)->first();
-        if ($desa) {
-            return ['wilayah' => $desa, 'tipe' => 'desa'];
-        }
-
-        // Cek apakah ada record dengan kecamatan_id = $id
-        $kecamatan = Wilayah::where('kecamatan_id', $id)->first();
-        if ($kecamatan) {
-            return ['wilayah' => $kecamatan, 'tipe' => 'kecamatan'];
-        }
-
-        // Cek apakah ada record dengan kota_id = $id
-        $kota = Wilayah::where('kota_id', $id)->first();
-        if ($kota) {
-            return ['wilayah' => $kota, 'tipe' => 'kota'];
-        }
-
-        return ['wilayah' => null, 'tipe' => null];
+        return Wilayah::find($id);
     }
 }

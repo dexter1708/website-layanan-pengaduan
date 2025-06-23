@@ -40,7 +40,7 @@
                         <!-- Nama Korban -->
                         <div>
                             <x-input-label for="korban_id" :value="__('Nama Korban')" />
-                            <select id="korban_id" name="korban_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" disabled>
+                            <select id="korban_id" name="korban_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" readonly>
                                 <option value="">Pilih Korban</option>
                             </select>
                             <x-input-error class="mt-2" :messages="$errors->get('korban_id')" />
@@ -67,41 +67,29 @@
                         <div>
                             <x-input-label for="nama_konselor" :value="__('Nama Konselor')" />
                             <select id="nama_konselor" name="nama_konselor" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" disabled>
-                                <option value="">Pilih Nama Konselor</option>
+                                <option value="">Pilih Jenis Layanan terlebih dahulu</option>
                             </select>
                             <x-input-error class="mt-2" :messages="$errors->get('nama_konselor')" />
                         </div>
 
-                        <!-- Jadwal Konseling -->
+                        <!-- Tanggal & Waktu Konseling -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Tanggal Konseling -->
                             <div>
                                 <x-input-label for="tanggal_konseling" :value="__('Tanggal Konseling')" />
-                                @php
-                                    $tanggal_konseling_value = old('tanggal_konseling', $konseling->jadwal_konseling ? \Carbon\Carbon::parse($konseling->jadwal_konseling)->format('Y-m-d') : '');
-                                @endphp
-                                <x-text-input id="tanggal_konseling" 
-                                             class="block mt-1 w-full" 
-                                             type="date" 
-                                             name="tanggal_konseling" 
-                                             :value="$tanggal_konseling_value" 
-                                             required />
+                                <x-text-input id="tanggal_konseling" class="block mt-1 w-full" type="date" name="tanggal_konseling" :value="old('tanggal_konseling', \Carbon\Carbon::parse($konseling->jadwal_konseling)->format('Y-m-d'))" required />
                                 <x-input-error class="mt-2" :messages="$errors->get('tanggal_konseling')" />
                             </div>
-
-                            <!-- Waktu Konseling -->
                             <div>
                                 <x-input-label for="waktu_konseling" :value="__('Waktu Konseling')" />
-                                @php
-                                    $waktu_konseling_value = old('waktu_konseling', $konseling->jadwal_konseling ? \Carbon\Carbon::parse($konseling->jadwal_konseling)->format('H:i') : '');
-                                @endphp
-                                <x-text-input id="waktu_konseling" 
-                                             class="block mt-1 w-full" 
-                                             type="time" 
-                                             name="waktu_konseling" 
-                                             :value="$waktu_konseling_value" 
-                                             required />
-                                <p class="mt-1 text-sm text-gray-500">Pilih waktu (format: HH:MM dalam 24 jam)</p>
+                                <select id="waktu_konseling" name="waktu_konseling" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                    @for ($i = 8; $i <= 15; $i++)
+                                        @if ($i === 12) @continue @endif
+                                        @php $time = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00'; @endphp
+                                        <option value="{{ $time }}" {{ old('waktu_konseling', \Carbon\Carbon::parse($konseling->jadwal_konseling)->format('H:i')) == $time ? 'selected' : '' }}>
+                                            {{ $time }} WIB
+                                        </option>
+                                    @endfor
+                                </select>
                                 <x-input-error class="mt-2" :messages="$errors->get('waktu_konseling')" />
                             </div>
                         </div>
@@ -109,39 +97,44 @@
                         <!-- Tempat Konseling -->
                         <div>
                             <x-input-label for="tempat_konseling" :value="__('Tempat Konseling')" />
-                            <x-text-input id="tempat_konseling" 
-                                         class="block mt-1 w-full" 
-                                         type="text" 
-                                         name="tempat_konseling" 
-                                         :value="old('tempat_konseling', $konseling->tempat_konseling)" 
-                                         required />
+                            <x-text-input id="tempat_konseling" class="block mt-1 w-full" type="text" name="tempat_konseling" :value="old('tempat_konseling', $konseling->tempat_konseling)" required />
                             <x-input-error class="mt-2" :messages="$errors->get('tempat_konseling')" />
                         </div>
 
                         <!-- Status Konfirmasi -->
                         <div>
                             <x-input-label for="konfirmasi" :value="__('Status Konfirmasi')" />
-                            <select id="konfirmasi" name="konfirmasi" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">Pilih Status (Opsional)</option>
-                                <option value="butuh_konfirmasi_staff" {{ old('konfirmasi', $konseling->konfirmasi) == 'butuh_konfirmasi_staff' ? 'selected' : '' }}>
-                                    Butuh Konfirmasi Staff
-                                </option>
-                                <option value="menunggu_konfirmasi_user" {{ old('konfirmasi', $konseling->konfirmasi) == 'menunggu_konfirmasi_user' ? 'selected' : '' }}>
-                                    Menunggu Konfirmasi User
-                                </option>
-                                <option value="setuju" {{ old('konfirmasi', $konseling->konfirmasi) == 'setuju' ? 'selected' : '' }}>
-                                    Setuju
-                                </option>
-                                <option value="tolak" {{ old('konfirmasi', $konseling->konfirmasi) == 'tolak' ? 'selected' : '' }}>
-                                    Tolak
-                                </option>
+                            @php
+                                $isAwaitingStaff = $konseling->konfirmasi === \App\Models\Konseling::STATUS_BUTUH_KONFIRMASI_STAFF;
+                            @endphp
+                            <select id="konfirmasi" name="konfirmasi" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" @if($isAwaitingStaff) readonly @endif>
+                                @if($isAwaitingStaff)
+                                    <option value="{{ \App\Models\Konseling::STATUS_MENUNGGU_KONFIRMASI_USER }}" selected>
+                                        Kirim Jadwal ke User untuk Dikonfirmasi
+                                    </option>
+                                @else
+                                    <option value="">Pilih Status (Opsional)</option>
+                                    <option value="{{ \App\Models\Konseling::STATUS_MENUNGGU_KONFIRMASI_USER }}" {{ old('konfirmasi', $konseling->konfirmasi) == \App\Models\Konseling::STATUS_MENUNGGU_KONFIRMASI_USER ? 'selected' : '' }}>
+                                        Menunggu Konfirmasi User
+                                    </option>
+                                    <option value="{{ \App\Models\Konseling::STATUS_TERKONFIRMASI }}" {{ old('konfirmasi', $konseling->konfirmasi) == \App\Models\Konseling::STATUS_TERKONFIRMASI ? 'selected' : '' }}>
+                                        Terkonfirmasi
+                                    </option>
+                                    <option value="{{ \App\Models\Konseling::STATUS_DIBATALKAN }}" {{ old('konfirmasi', $konseling->konfirmasi) == \App\Models\Konseling::STATUS_DIBATALKAN ? 'selected' : '' }}>
+                                        Dibatalkan
+                                    </option>
+                                @endif
                             </select>
-                            <p class="mt-1 text-sm text-gray-500">Biarkan kosong untuk mempertahankan status saat ini</p>
+                            @if($isAwaitingStaff)
+                                <p class="mt-1 text-sm text-gray-500">Status akan diubah menjadi "Menunggu Konfirmasi User".</p>
+                            @else
+                                <p class="mt-1 text-sm text-gray-500">Biarkan kosong untuk mempertahankan status saat ini.</p>
+                            @endif
                             <x-input-error class="mt-2" :messages="$errors->get('konfirmasi')" />
                         </div>
 
                         <div class="flex items-center gap-4">
-                            <x-primary-button>{{ __('Update') }}</x-primary-button>
+                            <x-primary-button>{{ __('Perbarui') }}</x-primary-button>
                         </div>
                     </form>
 
@@ -173,122 +166,90 @@
     </div>
 
     <!-- Hidden data container for JavaScript -->
-    <div id="pengaduan-data" 
-         data-pengaduan="{{ json_encode($pengaduans->map(function($pengaduan) {
-             return [
-                 'id' => $pengaduan->id,
-                 'korban' => $pengaduan->korban ? $pengaduan->korban->map(function($korban) {
-                     return [
-                         'id' => $korban->id,
-                         'nama' => $korban->nama ?? 'Nama tidak tersedia'
-                     ];
-                 }) : []
-             ];
+    <div id="pengaduan-data"
+         data-pengaduan="{{ json_encode($pengaduans->mapWithKeys(function($p) {
+            if ($p->korban) {
+                return [$p->id => ['id' => $p->korban->id, 'nama' => $p->korban->nama]];
+            }
+            return [$p->id => null];
          })) }}"
-         data-current-korban="{{ $konseling->korban_id }}"
+         data-current-korban-id="{{ $konseling->korban_id }}"
          data-layanan="{{ json_encode($layanans) }}"
          data-instruktur="{{ json_encode($instrukturs) }}"
-         data-current-konselor="{{ $konseling->nama_konselor }}"
-         data-current-layanan="{{ $konseling->jenis_layanan }}"
-         data-old-jenis-layanan="{{ old('jenis_layanan', $konseling->jenis_layanan) }}"
-         data-old-nama-konselor="{{ old('nama_konselor', $konseling->nama_konselor) }}"
+         data-current-nama-konselor="{{ $konseling->nama_konselor }}"
          style="display: none;">
     </div>
 
     @push('scripts')
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const pengaduanSelect = document.getElementById('pengaduan_id');
-                const korbanSelect = document.getElementById('korban_id');
-                const noKorbanMessage = document.getElementById('no-korban-message');
-                const dataContainer = document.getElementById('pengaduan-data');
-                const jenisLayananSelect = document.getElementById('jenis_layanan');
-                const namaKonselorSelect = document.getElementById('nama_konselor');
+        document.addEventListener('DOMContentLoaded', function () {
+            const pengaduanSelect = document.getElementById('pengaduan_id');
+            const korbanSelect = document.getElementById('korban_id');
+            const noKorbanMessage = document.getElementById('no-korban-message');
+            const dataContainer = document.getElementById('pengaduan-data');
+            const jenisLayananSelect = document.getElementById('jenis_layanan');
+            const namaKonselorSelect = document.getElementById('nama_konselor');
 
-                // Get data from hidden container
-                const pengaduanData = JSON.parse(dataContainer.getAttribute('data-pengaduan'));
-                const layananData = JSON.parse(dataContainer.getAttribute('data-layanan'));
-                const instrukturData = JSON.parse(dataContainer.getAttribute('data-instruktur'));
-                const currentKorban = dataContainer.getAttribute('data-current-korban');
-                const currentKonselor = dataContainer.getAttribute('data-current-konselor');
-                const currentLayanan = dataContainer.getAttribute('data-current-layanan');
-                const oldJenisLayanan = dataContainer.getAttribute('data-old-jenis-layanan');
-                const oldNamaKonselor = dataContainer.getAttribute('data-old-nama-konselor');
+            const pengaduanData = JSON.parse(dataContainer.getAttribute('data-pengaduan'));
+            const currentKorbanId = dataContainer.getAttribute('data-current-korban-id');
+            const layananData = JSON.parse(dataContainer.getAttribute('data-layanan'));
+            const instrukturData = JSON.parse(dataContainer.getAttribute('data-instruktur'));
+            const currentNamaKonselor = dataContainer.getAttribute('data-current-nama-konselor');
 
-                function updateKorbanOptions() {
-                    const selectedPengaduanId = pengaduanSelect.value;
-                    
-                    // Reset korban dropdown
-                    korbanSelect.innerHTML = '<option value="">Pilih Korban</option>';
-                    korbanSelect.disabled = true;
-                    noKorbanMessage.style.display = 'none';
+            function updateKorbanOptions() {
+                const selectedPengaduanId = pengaduanSelect.value;
+                korbanSelect.innerHTML = '<option value="">Pilih Korban</option>';
+                korbanSelect.disabled = true;
+                noKorbanMessage.style.display = 'none';
 
-                    if (selectedPengaduanId) {
-                        // Cari pengaduan yang dipilih
-                        const selectedPengaduan = pengaduanData.find(p => p.id == selectedPengaduanId);
-                        
-                        if (selectedPengaduan) {
-                            if (selectedPengaduan.korban && selectedPengaduan.korban.length > 0) {
-                                // Tambah semua korban untuk pengaduan ini
-                                selectedPengaduan.korban.forEach(function(korban) {
-                                    const option = document.createElement('option');
-                                    option.value = korban.id;
-                                    option.textContent = korban.nama;
-                                    // Set selected jika ini adalah korban yang sedang diedit
-                                    if (korban.id == currentKorban) {
-                                        option.selected = true;
-                                    }
-                                    korbanSelect.appendChild(option);
-                                });
-                                korbanSelect.disabled = false;
-                            } else {
-                                // Tidak ada korban
-                                noKorbanMessage.style.display = 'block';
+                if (selectedPengaduanId) {
+                    const selectedPengaduan = pengaduanData.find(p => p.id == selectedPengaduanId);
+                    const korban = selectedPengaduan ? selectedPengaduan.korban : null;
+
+                    if (korban) {
+                        const option = document.createElement('option');
+                        option.value = korban.id;
+                        option.textContent = korban.nama;
+                        if (korban.id == currentKorbanId) {
+                            option.selected = true;
+                        }
+                        korbanSelect.appendChild(option);
+                        korbanSelect.disabled = false;
+                    } else {
+                        noKorbanMessage.style.display = 'block';
+                    }
+                }
+            }
+
+            function updateNamaKonselorOptions() {
+                const selectedLayanan = jenisLayananSelect.value;
+                namaKonselorSelect.innerHTML = '<option value="">Pilih Nama Konselor</option>';
+                namaKonselorSelect.disabled = true;
+
+                if (selectedLayanan) {
+                    const filteredInstrukturs = instrukturData.filter(instruktur => instruktur.nama_layanan === selectedLayanan);
+                    if (filteredInstrukturs.length > 0) {
+                        filteredInstrukturs.forEach(function(instruktur) {
+                            const option = document.createElement('option');
+                            option.value = instruktur.nama;
+                            option.textContent = instruktur.nama + ' - ' + instruktur.posisi;
+                            if (instruktur.nama === currentNamaKonselor) {
+                                option.selected = true;
                             }
-                        }
-                    }
-                }
-
-                function updateNamaKonselorOptions() {
-                    const selectedLayanan = jenisLayananSelect.value;
-                    
-                    // Reset nama konselor dropdown
-                    namaKonselorSelect.innerHTML = '<option value="">Pilih Nama Konselor</option>';
-                    namaKonselorSelect.disabled = true;
-
-                    if (selectedLayanan) {
-                        // Filter instruktur berdasarkan nama_layanan yang sama dengan jenis_layanan yang dipilih
-                        const filteredInstrukturs = instrukturData.filter(function(instruktur) {
-                            return instruktur.nama_layanan === selectedLayanan;
+                            namaKonselorSelect.appendChild(option);
                         });
-
-                        if (filteredInstrukturs.length > 0) {
-                            // Tambah instruktur yang sesuai
-                            filteredInstrukturs.forEach(function(instruktur) {
-                                const option = document.createElement('option');
-                                option.value = instruktur.nama;
-                                option.textContent = instruktur.nama + ' - ' + instruktur.posisi;
-                                // Set selected jika ini adalah konselor yang sedang diedit atau old value
-                                if (instruktur.nama === currentKonselor || instruktur.nama === oldNamaKonselor) {
-                                    option.selected = true;
-                                }
-                                namaKonselorSelect.appendChild(option);
-                            });
-                            namaKonselorSelect.disabled = false;
-                        } else {
-                            // Tidak ada instruktur untuk layanan ini
-                            namaKonselorSelect.innerHTML = '<option value="">Tidak ada konselor untuk layanan ini</option>';
-                        }
+                        namaKonselorSelect.disabled = false;
                     }
                 }
+            }
 
-                pengaduanSelect.addEventListener('change', updateKorbanOptions);
-                jenisLayananSelect.addEventListener('change', updateNamaKonselorOptions);
+            pengaduanSelect.addEventListener('change', updateKorbanOptions);
+            jenisLayananSelect.addEventListener('change', updateNamaKonselorOptions);
 
-                // Initial call on page load
-                updateKorbanOptions();
-                updateNamaKonselorOptions();
-            });
+            // Initial calls to populate on page load
+            updateKorbanOptions();
+            updateNamaKonselorOptions();
+        });
         </script>
     @endpush
 </x-app-layout> 

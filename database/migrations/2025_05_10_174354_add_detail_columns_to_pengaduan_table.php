@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('bentuk_kekerasan')->nullable();
             $table->unsignedBigInteger('kecamatan')->nullable();
             $table->unsignedBigInteger('desa')->nullable();
-            $table->string('status')->nullable();            
+            $table->string('status')->nullable();
         });
     }
 

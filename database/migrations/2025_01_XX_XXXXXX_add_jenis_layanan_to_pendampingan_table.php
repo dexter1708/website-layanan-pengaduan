@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pendampingan', function (Blueprint $table) {
-            $table->enum('jenis_layanan', [
-                'pendampingan_hukum',
-                'pendampingan_kesehatan', 
-                'pendampingan_rehabilitasi_sosial',
-                'pendampingan_reintegrasi_sosial'
-            ])->default('pendampingan_hukum')->after('konfirmasi');
-        });
+        // Schema::table('pendampingans', function (Blueprint $table) {
+        //     $table->enum('jenis_layanan', [
+        //         'pendampingan_hukum',
+        //         'pendampingan_kesehatan', 
+        //         'pendampingan_rehabilitasi_sosial',
+        //         'pendampingan_reintegrasi_sosial'
+        //     ])->default('pendampingan_hukum')->after('konfirmasi');
+        // });
     }
 
     public function down(): void

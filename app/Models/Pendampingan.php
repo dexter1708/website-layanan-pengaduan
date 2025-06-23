@@ -2,15 +2,27 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Pendampingan extends Model
 {
+    use HasFactory;
+    
     protected $table = 'pendampingan';
+    protected $guarded = ['id'];
+    protected $appends = ['status_label', 'status_badge_class'];
+
+    // Constants for status
+    public const STATUS_BUTUH_KONFIRMASI_STAFF = 'butuh_konfirmasi_staff';
+    public const STATUS_MENUNGGU_KONFIRMASI_USER = 'menunggu_konfirmasi_user';
+    public const STATUS_TERKONFIRMASI = 'terkonfirmasi';
+    public const STATUS_DIBATALKAN = 'dibatalkan';
+
     protected $fillable = [
-        'pengaduan_id', 
-        'korban_id', 
-        'nama_korban',
+        'pengaduan_id',
+        'korban_id',
         'nama_pendamping',
         'tanggal_pendampingan',
         'tempat_pendampingan',
@@ -21,12 +33,6 @@ class Pendampingan extends Model
     protected $casts = [
         'tanggal_pendampingan' => 'datetime'
     ];
-
-    // Constants for status
-    const STATUS_BUTUH_KONFIRMASI_STAFF = 'butuh_konfirmasi_staff';
-    const STATUS_MENUNGGU_KONFIRMASI_USER = 'menunggu_konfirmasi_user';
-    const STATUS_TERKONFIRMASI = 'terkonfirmasi';
-    const STATUS_DIBATALKAN = 'dibatalkan';
 
     // Auto-fill nama_korban from korban relationship
     protected static function boot()
@@ -54,33 +60,34 @@ class Pendampingan extends Model
 
     public function pengaduan()
     {
-        return $this->belongsTo(Pengaduan::class);
+        return $this->belongsTo(Pengaduan::class, 'pengaduan_id');
     }
 
     public function korban()
     {
-        return $this->belongsTo(Korban::class);
+        return $this->belongsTo(Korban::class, 'korban_id');
     }
 
-    // Helper methods
-    public function isButuhKonfirmasiStaff()
+    public function getStatusLabelAttribute()
     {
-        return $this->konfirmasi === self::STATUS_BUTUH_KONFIRMASI_STAFF;
+        return match ($this->konfirmasi) {
+            self::STATUS_BUTUH_KONFIRMASI_STAFF => 'Menunggu Konfirmasi Staff',
+            self::STATUS_MENUNGGU_KONFIRMASI_USER => 'Menunggu Konfirmasi Anda',
+            self::STATUS_TERKONFIRMASI => 'Terkonfirmasi',
+            self::STATUS_DIBATALKAN => 'Dibatalkan',
+            default => 'Tidak Diketahui',
+        };
     }
 
-    public function isMenungguKonfirmasiUser()
+    public function getStatusBadgeClassAttribute()
     {
-        return $this->konfirmasi === self::STATUS_MENUNGGU_KONFIRMASI_USER;
-    }
-
-    public function isTerkonfirmasi()
-    {
-        return $this->konfirmasi === self::STATUS_TERKONFIRMASI;
-    }
-
-    public function isDibatalkan()
-    {
-        return $this->konfirmasi === self::STATUS_DIBATALKAN;
+        return match ($this->konfirmasi) {
+            self::STATUS_BUTUH_KONFIRMASI_STAFF => 'bg-yellow-500',
+            self::STATUS_MENUNGGU_KONFIRMASI_USER => 'bg-blue-500',
+            self::STATUS_TERKONFIRMASI => 'bg-green-500',
+            self::STATUS_DIBATALKAN => 'bg-red-500',
+            default => 'bg-gray-400',
+        };
     }
 
     public function getJenisLayananLabel()
@@ -88,18 +95,6 @@ class Pendampingan extends Model
         // Sekarang jenis_layanan menyimpan nama_layanan dari tabel layanan
         // Jadi langsung return saja karena sudah dalam format yang benar
         return $this->jenis_layanan;
-    }
-
-    public function getStatusLabel()
-    {
-        $labels = [
-            self::STATUS_BUTUH_KONFIRMASI_STAFF => 'Butuh Konfirmasi Staff',
-            self::STATUS_MENUNGGU_KONFIRMASI_USER => 'Menunggu Konfirmasi User',
-            self::STATUS_TERKONFIRMASI => 'Terkonfirmasi',
-            self::STATUS_DIBATALKAN => 'Dibatalkan',
-        ];
-
-        return $labels[$this->konfirmasi] ?? $this->konfirmasi;
     }
 
     // Helper methods for Indonesian date formatting

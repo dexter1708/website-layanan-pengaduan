@@ -19,11 +19,16 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CustomDashboardController;
 use App\Http\Controllers\DataDashboardController;
 use App\Http\Controllers\AnalyticsDashboardController;
+use App\Http\Controllers\KelolaDataController;
+use App\Http\Controllers\KonselingStaffController;
 
 // Public Routes
 Route::get('/', function () {
     return view('landing');
 });
+// Route::get('/Pengaduan', function () {
+//     return view('pengaduan.pengaduan');
+// });
 
 Route::get('/api/kecamatan/{kota_id}', [WilayahController::class, 'getKecamatan']);
 Route::get('/api/desa/{kecamatan_id}', [WilayahController::class, 'getDesa']);
@@ -33,20 +38,26 @@ Route::get('/api/desa/{kecamatan_id}', [WilayahController::class, 'getDesa']);
 // Route::get('/assessment', [AssessmentController::class, 'index'])->name('assessment.index');
 
 // --- START: ROUTE UNTUK SEMUA USER TEROTENTIKASI (Staff DAN Pelapor) ---
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/data-dashboard', [DataDashboardController::class, 'index'])->name('data-dashboard.index');
     Route::get('/analytics', [AnalyticsDashboardController::class, 'index'])->name('analytics.index');
     Route::get('/analytics/data', [AnalyticsDashboardController::class, 'getAnalyticsData'])->name('analytics.data');
 
+    // Kelola Data routes
+    Route::get('/kelola-data', [KelolaDataController::class, 'index'])->name('kelolaData');
+
     // Profile routes
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Pengaduan routes (misal: user create, staff list all)
-    Route::get('/pengaduan', [PengaduanController::class, 'create'])->name('pengaduan.create');
+    // Pengaduan routes
+    Route::get('/pengaduan', [PengaduanController::class, 'index'])->name('pengaduan.index');
+    Route::get('/pengaduan/create', [PengaduanController::class, 'create'])->name('pengaduan.create');
     Route::post('/pengaduan', [PengaduanController::class, 'store'])->name('pengaduan.store');
     Route::get('/pengaduan/{id}', [PengaduanController::class, 'show'])->name('pengaduan.show');
     Route::get('/riwayat', [PengaduanController::class, 'riwayat'])->name('pengaduan.riwayat');
@@ -56,41 +67,56 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
     Route::get('/tracking/{id}', [TrackingController::class, 'show'])->name('tracking.show');
 
-    // Konseling routes (index dan show, dapat diakses umum)
-    Route::prefix('konseling')->name('konseling.')->group(function () {
+    // --- KONSELING ---
+    Route::prefix('konseling')->name('konseling.')->group(function() {
         Route::get('/', [KonselingController::class, 'index'])->name('index');
-        Route::get('/{id}', [KonselingController::class, 'show'])->name('show');
-        Route::put('/{id}/konfirmasi', [KonselingController::class, 'updateKonfirmasi'])->name('update-konfirmasi');
-    });
-
-    // Pendampingan Routes - index dan show (UMUM)
-    Route::prefix('pendampingan')->name('pendampingan.')->group(function () {
-        Route::get('/', [PendampinganController::class, 'index'])->name('index');
-        Route::get('/{id}', [PendampinganController::class, 'show'])->name('show');
-        Route::put('/{id}/konfirmasi', [PendampinganController::class, 'updateKonfirmasi'])->name('update-konfirmasi');
-    });
-
-    // User Pendampingan Request Routes (KHUSUS USER/PELAPOR)
-    Route::prefix('user')->name('user.')->group(function () {
-        Route::prefix('pendampingan')->name('pendampingan.')->group(function () {
-            Route::get('/request', [PendampinganController::class, 'requestForm'])->name('request');
-            Route::post('/request', [PendampinganController::class, 'requestAccompaniment'])->name('request');
-        });
         
-        // User Konseling Request Routes (KHUSUS USER/PELAPOR)
-        Route::prefix('konseling')->name('konseling.')->group(function () {
+        Route::middleware([\App\Http\Middleware\PelaporOrUserMiddleware::class])->group(function() {
             Route::get('/request', [KonselingController::class, 'requestForm'])->name('request');
-            Route::post('/request', [KonselingController::class, 'requestCounseling'])->name('request');
+            Route::post('/request', [KonselingController::class, 'requestCounseling'])->name('request.store');
+        });
+
+        Route::prefix('/{id}')->group(function () {
+            Route::get('/', [KonselingController::class, 'show'])->name('show');
+            Route::middleware([\App\Http\Middleware\PelaporOrUserMiddleware::class])->group(function() {
+                Route::put('/konfirmasi', [KonselingController::class, 'updateKonfirmasi'])->name('update-konfirmasi');
+            });
+        });
+    });
+
+    // --- PENDAMPINGAN ---
+    Route::prefix('pendampingan')->name('pendampingan.')->group(function() {
+        Route::get('/', [PendampinganController::class, 'index'])->name('index');
+
+        Route::middleware([\App\Http\Middleware\PelaporOrUserMiddleware::class])->group(function() {
+            Route::get('/request', [PendampinganController::class, 'requestForm'])->name('request');
+            Route::post('/request', [PendampinganController::class, 'requestAccompaniment'])->name('request.store');
+        });
+
+        Route::prefix('/{id}')->group(function () {
+            Route::get('/', [PendampinganController::class, 'show'])->name('show');
+            Route::middleware([\App\Http\Middleware\PelaporOrUserMiddleware::class])->group(function() {
+                Route::patch('/konfirmasi', [PendampinganController::class, 'updateKonfirmasi'])->name('konfirmasi.update');
+            });
         });
     });
 });
 
 // --- START: ROUTE KHUSUS STAFF (menggunakan StaffMiddleware) ---
-Route::middleware(['auth', 'verified', StaffMiddleware::class])->prefix('staff')->name('staff.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['auth', StaffMiddleware::class])->prefix('staff')->name('staff.')->group(function () {
+    // Staff Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\StaffDashboardController::class, 'index'])->name('dashboard');
+
+    // Staff Pengaduan Management
+    Route::prefix('pengaduan')->name('pengaduan.')->group(function () {
+        Route::get('/', [PengaduanController::class, 'index'])->name('index');
+        Route::get('/{id}', [PengaduanController::class, 'show'])->name('show');
+        Route::delete('/{id}', [PengaduanController::class, 'destroy'])->name('destroy');
+    });
 
     // Staff Konseling Management
     Route::prefix('konseling')->name('konseling.')->group(function () {
+        Route::get('/', [KonselingController::class, 'index'])->name('index');
         Route::get('/create', [KonselingController::class, 'create'])->name('create');
         Route::post('/', [KonselingController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [KonselingController::class, 'edit'])->name('edit');
@@ -163,9 +189,10 @@ Route::middleware(['auth', 'verified', StaffMiddleware::class])->prefix('staff')
         Route::get('/{type}/{id}/edit', [WilayahController::class, 'edit'])->name('edit');
         Route::put('/{type}/{id}', [WilayahController::class, 'update'])->name('update');
         Route::delete('/{type}/{id}', [WilayahController::class, 'destroy'])->name('destroy');
-        
+
         Route::get('/kecamatan/{kotaId}', [WilayahController::class, 'getKecamatan']);
         Route::get('/desa/{kecamatanId}', [WilayahController::class, 'getDesa']);
+        Route::get('/get-kecamatan/{kotaId}', [WilayahController::class, 'getKecamatan'])->name('get-kecamatan');
     });
 
     // Instruktur Management
@@ -175,21 +202,18 @@ Route::middleware(['auth', 'verified', StaffMiddleware::class])->prefix('staff')
     Route::resource('layanan', \App\Http\Controllers\LayananController::class);
 });
 
-// Super Admin Routes (tetap sama)
-Route::prefix('management')->middleware(['auth', 'verified', SuperAdminMiddleware::class])->group(function () {
-    // ... staff management, user management ...
+// Super Admin Routes (hanya dashboard dan kelola staff)
+Route::prefix('admin')->middleware(['auth', SuperAdminMiddleware::class])->name('admin.')->group(function () {
+    // Super Admin Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Staff Management (hanya untuk super admin)
     Route::get('/staff', [UserManagementController::class, 'staffIndex'])->name('staff.index');
     Route::get('/staff/create', [UserManagementController::class, 'staffCreate'])->name('staff.create');
     Route::post('/staff', [UserManagementController::class, 'staffStore'])->name('staff.store');
     Route::get('/staff/{id}/edit', [UserManagementController::class, 'staffEdit'])->name('staff.edit');
     Route::put('/staff/{id}', [UserManagementController::class, 'staffUpdate'])->name('staff.update');
     Route::delete('/staff/{id}', [UserManagementController::class, 'staffDestroy'])->name('staff.destroy');
-
-    Route::get('/users', [UserManagementController::class, 'userIndex'])->name('users.index');
-    Route::get('/users/{id}', [UserManagementController::class, 'userShow'])->name('users.show');
-    Route::get('/users/{id}/edit', [UserManagementController::class, 'userEdit'])->name('users.edit');
-    Route::put('/users/{id}', [UserManagementController::class, 'userUpdate'])->name('users.update');
-    Route::delete('/users/{id}', [UserManagementController::class, 'userDestroy'])->name('users.destroy');
 });
 
 require __DIR__.'/auth.php';

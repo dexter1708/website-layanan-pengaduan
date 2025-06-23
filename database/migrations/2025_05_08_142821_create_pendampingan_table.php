@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('nama_pendamping');
             $table->dateTime('tanggal_pendampingan');
             $table->string('tempat_pendampingan');
+            $table->string('jenis_layanan');
             $table->string('konfirmasi')->default('menunggu');
             $table->timestamps();
         });

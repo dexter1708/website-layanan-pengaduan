@@ -1,183 +1,116 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Detail Pengaduan</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .section {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        h1, h2 {
-            color: #333;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .timeline {
-            position: relative;
-            padding-left: 30px;
-        }
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #4CAF50;
-        }
-        .timeline-item {
-            position: relative;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border-left: 4px solid #4CAF50;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -22px;
-            top: 20px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #4CAF50;
-            border: 3px solid white;
-        }
-        .timeline-status {
-            font-weight: bold;
-            color: #4CAF50;
-            margin-bottom: 5px;
-        }
-        .timeline-time {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-        .timeline-user {
-            color: #333;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-        .timeline-keterangan {
-            color: #555;
-            font-style: italic;
-        }
-        .btn-back {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-        .btn-back:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Detail Pengaduan #{{ $pengaduan->id }}</h1>
-        <a href="{{ route('tracking.index') }}" class="btn-back">← Kembali</a>
-        
-        <div class="section">
-            <h2>Informasi Pengaduan</h2>
-            <p><strong>Tanggal:</strong> {{ $pengaduan->created_at->format('d/m/Y H:i') }}</p>
-            <p><strong>Status Saat Ini:</strong> {{ ucfirst(str_replace('_', ' ', $pengaduan->status)) }}</p>
-        </div>
+@extends('template.main')
+@section('content_template')
 
-        <div class="section">
-            <h2>Riwayat Perubahan Status</h2>
-            <div class="timeline">
-                @forelse($pengaduan->historiTracking as $histori)
-                    <div class="timeline-item">
-                        <div class="timeline-status">
-                            @if($histori->status_sebelum)
-                                {{ ucfirst(str_replace('_', ' ', $histori->status_sebelum)) }} → {{ ucfirst(str_replace('_', ' ', $histori->status_sesudah)) }}
-                            @else
-                                Status: {{ ucfirst(str_replace('_', ' ', $histori->status_sesudah)) }}
-                            @endif
-                        </div>
-                        <div class="timeline-time">
-                            {{ $histori->created_at->format('d/m/Y H:i') }}
-                        </div>
-                        @if($histori->changedByUser)
-                            <div class="timeline-user">
-                                Diubah oleh: {{ $histori->changedByUser->name }}
-                            </div>
-                        @endif
-                        @if($histori->keterangan)
-                            <div class="timeline-keterangan">
-                                Keterangan: {{ $histori->keterangan }}
-                            </div>
-                        @endif
-                    </div>
-                @empty
-                    <p>Belum ada riwayat perubahan status</p>
-                @endforelse
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 40px;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        bottom: 10px;
+        width: 4px;
+        background-color: #e5e7eb; /* gray-200 */
+        border-radius: 2px;
+    }
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    .timeline-item .icon {
+        position: absolute;
+        left: -8px;
+        top: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 4px solid #fff;
+    }
+    .icon-menunggu { background-color: #f59e0b; } /* amber-500 */
+    .icon-proses, .icon-diproses { background-color: #3b82f6; } /* blue-500 */
+    .icon-selesai { background-color: #10b981; } /* emerald-500 */
+    .icon-ditolak { background-color: #ef4444; } /* red-500 */
+    .icon-default { background-color: #6b7280; } /* gray-500 */
+</style>
+
+<section class="bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Breadcrumb -->
+        <nav class="text-sm text-gray-600 font-semibold mb-6" aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-2">
+                <li><a href="{{ url('/') }}" class="text-blue-600 hover:underline">Homepage</a></li>
+                <li class="text-gray-600">/</li>
+                <li><a href="{{ route('tracking.index') }}" class="text-blue-600 hover:underline">Track Pengaduan</a></li>
+                <li class="text-gray-600">/</li>
+                <li class="text-gray-500">Riwayat Pengaduan</li>
+            </ol>
+        </nav>
+
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- Header -->
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Riwayat Pengaduan #{{ $pengaduan->id }}</h2>
+                    <p class="text-sm text-gray-600 mt-1">Status Saat Ini: 
+                        <span class="font-semibold px-2 py-1 rounded-full 
+                            @if($pengaduan->status === 'selesai') bg-green-100 text-green-800
+                            @elseif($pengaduan->status === 'ditolak') bg-red-100 text-red-800
+                            @elseif($pengaduan->status === 'diproses') bg-blue-100 text-blue-800
+                            @else bg-yellow-100 text-yellow-800
+                            @endif">
+                            {{ ucfirst(str_replace('_', ' ', $pengaduan->status ?? 'Menunggu')) }}
+                        </span>
+                    </p>
+                </div>
+                <div class="flex items-center gap-4">
+                    @if(Auth::user()->role === 'staff')
+                        <a href="{{ route('staff.tracking.edit', $pengaduan->id) }}" class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm">
+                            Update Status
+                        </a>
+                    @endif
+                    <a href="{{ route('tracking.index') }}" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm">
+                        Kembali ke Daftar
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <div class="section">
-            <h2>Data Pelapor</h2>
-            @if($pengaduan->pelapor)
-                <p><strong>Nama:</strong> {{ $pengaduan->pelapor->nama_pelapor }}</p>
-                <p><strong>NIK:</strong> {{ $pengaduan->pelapor->nik }}</p>
-                <p><strong>Alamat:</strong> {{ $pengaduan->pelapor->alamat }}</p>
-            @else
-                <p>Data pelapor tidak tersedia</p>
-            @endif
-        </div>
-
-        <div class="section">
-            <h2>Data Korban</h2>
-            @if($pengaduan->korban && $pengaduan->korban->count() > 0)
-                @foreach($pengaduan->korban as $korban)
-                    <div style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px;">
-                        <p><strong>Nama:</strong> {{ $korban->nama }}</p>
-                        <p><strong>NIK:</strong> {{ $korban->nik }}</p>
-                        <p><strong>Alamat:</strong> {{ $korban->alamat }}</p>
-                    </div>
-                @endforeach
-            @else
-                <p>Data korban tidak tersedia</p>
-            @endif
-        </div>
-
-        @if($pengaduan->pelaku && $pengaduan->pelaku->count() > 0)
-            <div class="section">
-                <h2>Data Pelaku</h2>
-                @foreach($pengaduan->pelaku as $pelaku)
-                    <div style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px;">
-                        <p><strong>Nama:</strong> {{ $pelaku->nama }}</p>
-                        <p><strong>Alamat:</strong> {{ $pelaku->alamat }}</p>
-                    </div>
-                @endforeach
+            <!-- Detail Content -->
+            <div class="p-8">
+                <div class="timeline">
+                    @forelse($pengaduan->historiTracking as $histori)
+                        <div class="timeline-item">
+                            @php
+                                $iconClass = 'icon-' . strtolower($histori->status_sesudah);
+                            @endphp
+                            <div class="icon {{ $iconClass }}">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <div class="ml-10">
+                                <h3 class="font-bold text-lg text-gray-800">
+                                    Status: {{ ucfirst(str_replace('_', ' ', $histori->status_sesudah)) }}
+                                </h3>
+                                <p class="text-sm text-gray-500 mb-2">{{ $histori->created_at->format('d F Y, H:i') }}</p>
+                                @if($histori->keterangan)
+                                    <p class="bg-gray-50 p-3 rounded-md text-gray-700 italic">"{{ $histori->keterangan }}"</p>
+                                @endif
+                                @if($histori->changedByUser)
+                                    <p class="text-xs text-gray-400 mt-2">Diubah oleh: {{ $histori->changedByUser->name ?? 'Sistem' }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <p class="ml-10 text-gray-500">Belum ada riwayat perubahan status untuk pengaduan ini.</p>
+                    @endforelse
+                </div>
             </div>
-        @endif
-
-        <div class="section">
-            <h2>Kronologi Kejadian</h2>
-            <p>{{ $pengaduan->kronologi }}</p>
         </div>
     </div>
-</body>
-</html> 
+</section>
+
+@endsection 

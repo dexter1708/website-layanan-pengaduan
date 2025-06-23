@@ -23,18 +23,6 @@ class DataDashboardController extends Controller
         // Base query dengan eager loading
         $query = Pengaduan::with(['korban', 'pelapor', 'pelaku']);
 
-        // Filter berdasarkan jumlah korban
-        if ($request->filled('jumlah_korban')) {
-            $query->whereHas('korban', function($q) use ($request) {
-                $q->havingRaw('COUNT(*) = ?', [$request->jumlah_korban]);
-            });
-        }
-
-        // Filter berdasarkan bentuk kekerasan
-        if ($request->filled('bentuk_kekerasan')) {
-            $query->where('bentuk_kekerasan', $request->bentuk_kekerasan);
-        }
-
         // Filter berdasarkan status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -48,11 +36,12 @@ class DataDashboardController extends Controller
         // Hitung total pengaduan
         $totalPengaduan = $query->count();
 
-        // Hitung pengaduan berdasarkan status
+        // Pengaduan berdasarkan status (menggantikan bentuk kekerasan)
         $pengaduanByStatus = $query->clone()
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
-            ->pluck('total', 'status');
+            ->pluck('total', 'status')
+            ->toArray();
 
         // Hitung jumlah pengaduan per status untuk card statistik
         $pengaduanMenunggu = $pengaduanByStatus['menunggu'] ?? 0;
@@ -74,12 +63,16 @@ class DataDashboardController extends Controller
         }
 
         // Statistik Korban
-        $statistikKorban = $query->clone()
+        $allKorban = $query->clone()
             ->with('korban')
             ->get()
-            ->flatMap->korban
-            ->groupBy('jenis_kelamin')
-            ->map(function($group) {
+            ->map(function ($pengaduan) {
+                return $pengaduan->korban;
+            })
+            ->filter(); // Hapus nilai null jika ada pengaduan tanpa korban
+
+        $statistikKorban = $allKorban->groupBy('jenis_kelamin')
+            ->map(function ($group) {
                 return [
                     'total' => $group->count(),
                     'usia' => [
@@ -119,19 +112,6 @@ class DataDashboardController extends Controller
                         ->map->count()
                 ];
             });
-
-        // Hitung pengaduan berdasarkan jumlah korban
-        $pengaduanByJumlahKorban = $query->clone()
-            ->withCount('korban')
-            ->get()
-            ->groupBy('korban_count')
-            ->map->count();
-
-        // Hitung pengaduan berdasarkan bentuk kekerasan
-        $pengaduanByBentukKekerasan = $query->clone()
-            ->selectRaw('bentuk_kekerasan, count(*) as total')
-            ->groupBy('bentuk_kekerasan')
-            ->pluck('total', 'bentuk_kekerasan');
 
         // Hitung trend bulanan (6 bulan terakhir)
         $pengaduanByBulan = $query->clone()
@@ -195,9 +175,7 @@ class DataDashboardController extends Controller
             ->get();
 
         // Data untuk filter
-        $jumlahKorbanOptions = $pengaduanByJumlahKorban->keys()->sort()->values();
-        $bentukKekerasanOptions = $pengaduanByBentukKekerasan->keys()->filter()->values();
-        $statusOptions = $pengaduanByStatus->keys()->values();
+        $statusOptions = Pengaduan::select('status')->distinct()->pluck('status')->toArray();
 
         return view('data-dashboard.index', compact(
             'totalPengaduan',
@@ -210,12 +188,8 @@ class DataDashboardController extends Controller
             'totalUsers',
             'totalStaff',
             'pengaduanByStatus',
-            'pengaduanByJumlahKorban',
-            'pengaduanByBentukKekerasan',
             'pengaduanByBulan',
             'pengaduanTerbaru',
-            'jumlahKorbanOptions',
-            'bentukKekerasanOptions',
             'statusOptions',
             'statistikKorban',
             'statistikPelaku',

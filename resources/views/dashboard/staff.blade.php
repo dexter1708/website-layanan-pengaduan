@@ -79,7 +79,9 @@
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $pengaduan->id }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $pengaduan->created_at->format('d/m/Y') }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $pengaduan->pelapor ? $pengaduan->pelapor->nama_pelapor : '-' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {{ optional($pengaduan->pelapor)->nama_pelapor ?? '-' }}
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                                 @if($pengaduan->status === 'selesai') bg-green-100 text-green-800

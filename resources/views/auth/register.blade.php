@@ -1,163 +1,275 @@
 <x-guest-layout>
-    <!-- Add jQuery before the form -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .register-container {
+            background-color: white;
+            padding: 2.5rem;
+            width: 75%;
+            margin: 2rem auto;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .register-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .register-logo img {
+            height: 5rem;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        .form-group {
+            margin-bottom: 0;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.875rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            background-color: #f7fafc;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 1px #4299e1;
+        }
+        .btn-register {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-register:hover {
+            background-color: #2563eb;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: #4a5568;
+        }
+        .login-link a {
+            color: #3b82f6;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+    <div class="register-container">
+        <div class="register-logo">
+            <img src="{{ asset('assets/image.png') }}" alt="Logo">
         </div>
+        
+        <form method="POST" action="{{ route('register') }}" class="mt-8">
+            @csrf
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Register</h2>
+            <div class="form-grid">
+                <!-- Nama Lengkap -->
+                <div class="form-group">
+                    <label for="name" class="form-label">Nama Lengkap</label>
+                    <input id="name" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" class="form-input" placeholder="Nama">
+                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                </div>
+                
+                <!-- NIK -->
+                <div class="form-group">
+                    <label for="nik" class="form-label">NIK</label>
+                    <input id="nik" type="text" name="nik" :value="old('nik')" required class="form-input" placeholder="NIK">
+                    <x-input-error :messages="$errors->get('nik')" class="mt-2" />
+                </div>
+                
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input id="email" type="email" name="email" :value="old('email')" required autocomplete="username" class="form-input" placeholder="Email">
+                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                </div>
+                
+                <!-- No Handphone -->
+                <div class="form-group">
+                    <label for="no_telepon" class="form-label">No Handphone</label>
+                    <input id="no_telepon" type="tel" name="no_telepon" :value="old('no_telepon')" required class="form-input" placeholder="No Handphone">
+                    <x-input-error :messages="$errors->get('no_telepon')" class="mt-2" />
+                </div>
+                
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input id="password" type="password" name="password" required autocomplete="new-password" class="form-input" placeholder="Password">
+                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                </div>
+                
+                <!-- Konfirmasi Password -->
+                <div class="form-group">
+                    <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
+                    <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" class="form-input" placeholder="Konfirmasi Password">
+                    <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                </div>
+                
+                <!-- Kabupaten/Kota -->
+                <div class="form-group">
+                    <label for="kota" class="form-label">Kabupaten/ Kota</label>
+                    <select id="kota" name="kota" required class="form-input">
+                        <option value="">--Pilih Kabupaten/ Kota--</option>
+                        @foreach ($kotas as $kota)
+                            <option value="{{ $kota->kota_id }}" {{ old('kota') == $kota->kota_id ? 'selected' : '' }}>{{ $kota->kota_nama }}</option>
+                        @endforeach
+                    </select>
+                    <x-input-error :messages="$errors->get('kota')" class="mt-2" />
+                </div>
+                
+                <!-- Kecamatan -->
+                <div class="form-group">
+                    <label for="kecamatan" class="form-label">Kecamatan</label>
+                    <select id="kecamatan" name="kecamatan" required class="form-input">
+                        <option value="">--Pilih Kecamatan--</option>
+                    </select>
+                    <x-input-error :messages="$errors->get('kecamatan')" class="mt-2" />
+                </div>
 
-        <!-- Email -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                <!-- Kelurahan/Desa -->
+                <div class="form-group">
+                    <label for="desa" class="form-label">Kelurahan</label>
+                    <select id="desa" name="desa" required class="form-input">
+                        <option value="">--Pilih Kelurahan--</option>
+                    </select>
+                    <x-input-error :messages="$errors->get('desa')" class="mt-2" />
+                </div>
+                
+                <!-- RT -->
+                <div class="form-group">
+                    <label for="RT" class="form-label">RT</label>
+                    <input id="RT" type="text" name="RT" value="{{ old('RT') }}" required class="form-input" placeholder="RT">
+                    <x-input-error :messages="$errors->get('RT')" class="mt-2" />
+                </div>
+
+                <!-- RW -->
+                <div class="form-group">
+                    <label for="RW" class="form-label">RW</label>
+                    <input id="RW" type="text" name="RW" value="{{ old('RW') }}" required class="form-input" placeholder="RW">
+                    <x-input-error :messages="$errors->get('RW')" class="mt-2" />
+                </div>
+
+                <div class="form-group full-width">
+                    <button type="submit" class="btn-register">
+                        Registrasi
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="login-link">
+            Sudah punya akun? <a href="{{ route('login') }}">Login disini</a>
         </div>
+    </div>
 
-        <!-- NIK -->
-        <div class="mt-4">
-            <x-input-label for="nik" :value="__('NIK')" />
-            <x-text-input id="nik" class="block mt-1 w-full" type="text" name="nik" :value="old('nik')" required />
-            <x-input-error :messages="$errors->get('nik')" class="mt-2" />
-        </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const kotaSelect = document.getElementById('kota');
+            const kecamatanSelect = document.getElementById('kecamatan');
+            const desaSelect = document.getElementById('desa');
 
-        <!-- Nomor Telepon -->
-        <div class="mt-4">
-            <x-input-label for="no_telepon" :value="__('Nomor Telepon')" />
-            <x-text-input id="no_telepon" class="block mt-1 w-full" type="tel" name="no_telepon" :value="old('no_telepon')" required placeholder="08xxxxxxxxxx" />
-            <x-input-error :messages="$errors->get('no_telepon')" class="mt-2" />
-        </div>
+            const oldKecamatan = "{{ old('kecamatan') }}";
+            const oldDesa = "{{ old('desa') }}";
 
-        <!-- Kota -->
-        <div class="mt-4">
-            <x-input-label for="kota" :value="__('Kota')" />
-            <select id="kota" name="kota" class="block mt-1 w-full" required>
-                <option value="">--Pilih Kota--</option>
-                @foreach ($kotas as $kota)
-                    <option value="{{ $kota->kota_id }}">{{ $kota->kota_nama }}</option>
-                @endforeach
-            </select>
-            <x-input-error :messages="$errors->get('kota')" class="mt-2" />
-        </div>
-
-        <!-- Kecamatan -->
-        <div class="mt-4">
-            <x-input-label for="kecamatan" :value="__('Kecamatan')" />
-            <select id="kecamatan" name="kecamatan" class="block mt-1 w-full" required>
-                <option value="">--Pilih Kecamatan--</option>
-            </select>
-            <x-input-error :messages="$errors->get('kecamatan')" class="mt-2" />
-        </div>
-
-        <!-- Desa -->
-        <div class="mt-4">
-            <x-input-label for="desa" :value="__('Desa')" />
-            <select id="desa" name="desa" class="block mt-1 w-full" required>
-                <option value="">--Pilih Desa--</option>
-            </select>
-            <x-input-error :messages="$errors->get('desa')" class="mt-2" />
-        </div>
-
-        <!-- RT -->
-        <div class="mt-4">
-            <x-input-label for="RT" :value="__('RT')" />
-            <x-text-input id="RT" class="block mt-1 w-full" type="text" name="RT" :value="old('RT')" required />
-            <x-input-error :messages="$errors->get('RT')" class="mt-2" />
-        </div>
-
-        <!-- RW -->
-        <div class="mt-4">
-            <x-input-label for="RW" :value="__('RW')" />
-            <x-text-input id="RW" class="block mt-1 w-full" type="text" name="RW" :value="old('RW')" required />
-            <x-input-error :messages="$errors->get('RW')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            // Ketika kota dipilih, ambil kecamatan yang sesuai
-            $('#kota').on('change', function() {
-                var kota_id = $(this).val();
-                if (kota_id) {
-                    $.ajax({
-                        url: '/api/kecamatan/' + kota_id,
-                        type: 'GET',
-                        success: function(data) {
-                            $('#kecamatan').empty();
-                            $('#kecamatan').append('<option value="">--Pilih Kecamatan--</option>');
-                            $.each(data, function(key, value) {
-                                $('#kecamatan').append('<option value="'+ value.id +'">' + value.kecamatan_nama +'</option>');
-                            });
-                            // Reset desa dropdown
-                            $('#desa').empty();
-                            $('#desa').append('<option value="">--Pilih Desa--</option>');
-                        },
-                        error: function() {
-                            alert('Terjadi kesalahan saat mengambil data kecamatan');
-                        }
+            async function fetchKecamatan(kotaId) {
+                kecamatanSelect.innerHTML = '<option value="">Memuat...</option>';
+                desaSelect.innerHTML = '<option value="">--Pilih Kelurahan--</option>';
+                try {
+                    const response = await fetch(`/api/kecamatan/${kotaId}`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+                    
+                    kecamatanSelect.innerHTML = '<option value="">--Pilih Kecamatan--</option>';
+                    data.forEach(item => {
+                        const option = new Option(item.kecamatan_nama, item.kecamatan_id);
+                        kecamatanSelect.add(option);
                     });
+                    
+                    if (oldKecamatan) {
+                        kecamatanSelect.value = oldKecamatan;
+                        kecamatanSelect.dispatchEvent(new Event('change')); // Trigger change to load desa
+                    }
+                } catch (error) {
+                    console.error('Error fetching kecamatan:', error);
+                    kecamatanSelect.innerHTML = '<option value="">Gagal memuat</option>';
+                }
+            }
+
+            async function fetchDesa(kecamatanId) {
+                desaSelect.innerHTML = '<option value="">Memuat...</option>';
+                try {
+                    const response = await fetch(`/api/desa/${kecamatanId}`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+                    
+                    desaSelect.innerHTML = '<option value="">--Pilih Kelurahan--</option>';
+                    data.forEach(item => {
+                        const option = new Option(item.desa_nama, item.desa_id);
+                        desaSelect.add(option);
+                    });
+                    
+                    if (oldDesa) {
+                        desaSelect.value = oldDesa;
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching desa:', error);
+                    desaSelect.innerHTML = '<option value="">Gagal memuat</option>';
+                }
+            }
+
+            kotaSelect.addEventListener('change', function() {
+                if (this.value) {
+                    fetchKecamatan(this.value);
                 } else {
-                    // Reset both dropdowns if no kota selected
-                    $('#kecamatan').empty();
-                    $('#kecamatan').append('<option value="">--Pilih Kecamatan--</option>');
-                    $('#desa').empty();
-                    $('#desa').append('<option value="">--Pilih Desa--</option>');
+                    kecamatanSelect.innerHTML = '<option value="">--Pilih Kecamatan--</option>';
+                    desaSelect.innerHTML = '<option value="">--Pilih Kelurahan--</option>';
                 }
             });
 
-            // Ketika kecamatan dipilih, ambil desa yang sesuai
-            $('#kecamatan').on('change', function() {
-                var kecamatan_id = $(this).val();
-                if (kecamatan_id) {
-                    $.ajax({
-                        url: '/api/desa/' + kecamatan_id,
-                        type: 'GET',
-                        success: function(data) {
-                            $('#desa').empty();
-                            $('#desa').append('<option value="">--Pilih Desa--</option>');
-                            $.each(data, function(key, value) {
-                                $('#desa').append('<option value="'+ value.id +'">' + value.desa_nama +'</option>');
-                            });
-                        },
-                        error: function() {
-                            alert('Terjadi kesalahan saat mengambil data desa');
-                        }
-                    });
+            kecamatanSelect.addEventListener('change', function() {
+                if (this.value) {
+                    fetchDesa(this.value);
                 } else {
-                    // Reset desa dropdown if no kecamatan selected
-                    $('#desa').empty();
-                    $('#desa').append('<option value="">--Pilih Desa--</option>');
+                    desaSelect.innerHTML = '<option value="">--Pilih Kelurahan--</option>';
                 }
             });
+
+            // If there's an old value for kota, trigger the load for kecamatan
+            if (kotaSelect.value) {
+                fetchKecamatan(kotaSelect.value);
+            }
         });
     </script>
 </x-guest-layout>

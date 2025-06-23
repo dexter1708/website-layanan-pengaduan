@@ -17,9 +17,9 @@ class AdminSeeder extends Seeder
         // Create Staff
         User::create([
             'name' => 'arian',
-            'email' => 'staff@admin.com',
+            'email' => 'stafarian@admin.com',
             'password' => Hash::make('staff123'),
-            'nik' => '2345678901234567',
+            'nik' => '4545454564564454545',
             'role' => 'staff',
             'email_verified_at' => now(),
         ]);

@@ -2,22 +2,30 @@
 
 namespace App\Models;
 
+use App\Models\User;
+use App\Models\Korban;
+use App\Models\Pelaku;
+use App\Models\Pelapor;
+use App\Models\Konseling;
+use App\Models\Assessment;
+use App\Models\Pendampingan;
+use App\Models\HistoriTracking;
 use Illuminate\Database\Eloquent\Model;
 
 class Pengaduan extends Model
 {
 
     protected $table = 'pengaduan';
-    protected $fillable = [ 'user_id',
-    'tempat_kejadian',
-    'tanggal_kejadian',
-    'jenis_laporan',
-    'kronologi',
-    'jenis_kasus',
-    'bentuk_kekerasan',
-    'kecamatan',
-    'desa',
-    'status',];
+    protected $fillable = [
+        'user_id',
+        'tempat_kejadian',
+        'tanggal_kejadian',
+        'kronologi',
+        'kecamatan',
+        'status',
+    ];
+
+
 
     public function user()
     {
@@ -31,7 +39,7 @@ class Pengaduan extends Model
 
     public function korban()
     {
-        return $this->hasMany(Korban::class);
+        return $this->hasOne(Korban::class);
     }
 
     public function pelaku()
@@ -58,4 +66,7 @@ class Pengaduan extends Model
     {
         return $this->hasMany(HistoriTracking::class)->orderBy('created_at', 'desc');
     }
+    // Di app/Models/Pengaduan.php
+
+
 }

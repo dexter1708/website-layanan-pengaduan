@@ -72,8 +72,15 @@
                             </div>
                             <div>
                                 <x-input-label for="waktu_pendampingan" :value="__('Waktu Pendampingan')" />
-                                <x-text-input id="waktu_pendampingan" class="block mt-1 w-full" type="time" name="waktu_pendampingan" :value="old('waktu_pendampingan', \Carbon\Carbon::parse($pendampingan->tanggal_pendampingan)->format('H:i'))" required autocomplete="waktu_pendampingan" />
-                                <p class="mt-1 text-sm text-gray-500">Pilih waktu (format: HH:MM dalam 24 jam)</p>
+                                <select id="waktu_pendampingan" name="waktu_pendampingan" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                    @for ($i = 8; $i <= 15; $i++)
+                                        @if ($i === 12) @continue @endif
+                                        @php $time = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00'; @endphp
+                                        <option value="{{ $time }}" {{ old('waktu_pendampingan', \Carbon\Carbon::parse($pendampingan->tanggal_pendampingan)->format('H:i')) == $time ? 'selected' : '' }}>
+                                            {{ $time }} WIB
+                                        </option>
+                                    @endfor
+                                </select>
                                 <x-input-error class="mt-2" :messages="$errors->get('waktu_pendampingan')" />
                             </div>
                         </div>
@@ -88,22 +95,32 @@
                         <!-- Status Konfirmasi -->
                         <div>
                             <x-input-label for="konfirmasi" :value="__('Status Konfirmasi')" />
-                            <select id="konfirmasi" name="konfirmasi" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">Pilih Status (Opsional)</option>
-                                <option value="{{ \App\Models\Pendampingan::STATUS_BUTUH_KONFIRMASI_STAFF }}" {{ old('konfirmasi', $pendampingan->konfirmasi) == \App\Models\Pendampingan::STATUS_BUTUH_KONFIRMASI_STAFF ? 'selected' : '' }}>
-                                    Butuh Konfirmasi Staff
-                                </option>
-                                <option value="{{ \App\Models\Pendampingan::STATUS_MENUNGGU_KONFIRMASI_USER }}" {{ old('konfirmasi', $pendampingan->konfirmasi) == \App\Models\Pendampingan::STATUS_MENUNGGU_KONFIRMASI_USER ? 'selected' : '' }}>
-                                    Menunggu Konfirmasi User
-                                </option>
-                                <option value="{{ \App\Models\Pendampingan::STATUS_TERKONFIRMASI }}" {{ old('konfirmasi', $pendampingan->konfirmasi) == \App\Models\Pendampingan::STATUS_TERKONFIRMASI ? 'selected' : '' }}>
-                                    Terkonfirmasi
-                                </option>
-                                <option value="{{ \App\Models\Pendampingan::STATUS_DIBATALKAN }}" {{ old('konfirmasi', $pendampingan->konfirmasi) == \App\Models\Pendampingan::STATUS_DIBATALKAN ? 'selected' : '' }}>
-                                    Dibatalkan
-                                </option>
+                            @php
+                                $isAwaitingStaff = $pendampingan->konfirmasi === \App\Models\Pendampingan::STATUS_BUTUH_KONFIRMASI_STAFF;
+                            @endphp
+                            <select id="konfirmasi" name="konfirmasi" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" @if($isAwaitingStaff) readonly @endif>
+                                @if($isAwaitingStaff)
+                                    <option value="{{ \App\Models\Pendampingan::STATUS_MENUNGGU_KONFIRMASI_USER }}" selected>
+                                        Kirim Jadwal ke User untuk Dikonfirmasi
+                                    </option>
+                                @else
+                                    <option value="">Pilih Status (Opsional)</option>
+                                    <option value="{{ \App\Models\Pendampingan::STATUS_MENUNGGU_KONFIRMASI_USER }}" {{ old('konfirmasi', $pendampingan->konfirmasi) == \App\Models\Pendampingan::STATUS_MENUNGGU_KONFIRMASI_USER ? 'selected' : '' }}>
+                                        Menunggu Konfirmasi User
+                                    </option>
+                                    <option value="{{ \App\Models\Pendampingan::STATUS_TERKONFIRMASI }}" {{ old('konfirmasi', $pendampingan->konfirmasi) == \App\Models\Pendampingan::STATUS_TERKONFIRMASI ? 'selected' : '' }}>
+                                        Terkonfirmasi
+                                    </option>
+                                    <option value="{{ \App\Models\Pendampingan::STATUS_DIBATALKAN }}" {{ old('konfirmasi', $pendampingan->konfirmasi) == \App\Models\Pendampingan::STATUS_DIBATALKAN ? 'selected' : '' }}>
+                                        Dibatalkan
+                                    </option>
+                                @endif
                             </select>
-                            <p class="mt-1 text-sm text-gray-500">Biarkan kosong untuk mempertahankan status saat ini</p>
+                            @if($isAwaitingStaff)
+                                <p class="mt-1 text-sm text-gray-500">Status akan diubah menjadi "Menunggu Konfirmasi User".</p>
+                            @else
+                                <p class="mt-1 text-sm text-gray-500">Biarkan kosong untuk mempertahankan status saat ini.</p>
+                            @endif
                             <x-input-error class="mt-2" :messages="$errors->get('konfirmasi')" />
                         </div>
 
@@ -125,16 +142,11 @@
 
     <!-- Hidden data container for JavaScript -->
     <div id="pengaduan-data" 
-         data-pengaduan="{{ json_encode($pengaduans->map(function($pengaduan) {
-             return [
-                 'id' => $pengaduan->id,
-                 'korban' => $pengaduan->korban ? $pengaduan->korban->map(function($korban) {
-                     return [
-                         'id' => $korban->id,
-                         'nama' => $korban->nama ?? 'Nama tidak tersedia'
-                     ];
-                 }) : []
-             ];
+         data-pengaduan="{{ json_encode($pengaduans->mapWithKeys(function($p) {
+            if ($p->korban) {
+                return [$p->id => ['id' => $p->korban->id, 'nama' => $p->korban->nama]];
+            }
+            return [$p->id => null];
          })) }}"
          data-current-korban-id="{{ $pendampingan->korban_id }}"
          data-layanan="{{ json_encode($layanans) }}"
@@ -168,33 +180,26 @@
                 function updateKorbanOptions() {
                     const selectedPengaduanId = pengaduanSelect.value;
                     
-                    // Reset korban dropdown
                     korbanSelect.innerHTML = '<option value="">Pilih Korban</option>';
                     korbanSelect.disabled = true;
                     noKorbanMessage.style.display = 'none';
 
                     if (selectedPengaduanId) {
-                        // Cari pengaduan yang dipilih
-                        const selectedPengaduan = pengaduanData.find(p => p.id == selectedPengaduanId);
-                        
-                        if (selectedPengaduan) {
-                            if (selectedPengaduan.korban && selectedPengaduan.korban.length > 0) {
-                                // Tambah semua korban untuk pengaduan ini
-                                selectedPengaduan.korban.forEach(function(korban) {
-                                    const option = document.createElement('option');
-                                    option.value = korban.id;
-                                    option.textContent = korban.nama;
-                                    // Set selected if it's the current korban for this pendampingan
-                                    if (korban.id == currentKorbanId) {
-                                        option.selected = true;
-                                    }
-                                    korbanSelect.appendChild(option);
-                                });
-                                korbanSelect.disabled = false;
-                            } else {
-                                // Tidak ada korban
-                                noKorbanMessage.style.display = 'block';
+                        const selectedPengaduanData = pengaduanData.find(p => p.id == selectedPengaduanId);
+                        const korban = selectedPengaduanData ? selectedPengaduanData.korban : null;
+
+                        if (korban) {
+                            const option = document.createElement('option');
+                            option.value = korban.id;
+                            option.textContent = korban.nama;
+                            
+                            if (korban.id == currentKorbanId) {
+                                option.selected = true;
                             }
+                            korbanSelect.appendChild(option);
+                            korbanSelect.disabled = false;
+                        } else {
+                            noKorbanMessage.style.display = 'block';
                         }
                     }
                 }

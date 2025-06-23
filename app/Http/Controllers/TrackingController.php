@@ -17,12 +17,12 @@ class TrackingController extends Controller
         if ($user->role === 'pelapor') {
             $pengaduans = Pengaduan::with(['pelapor.alamat', 'korban'])
                 ->where('user_id', $user->id)
-                ->orderBy('created_at', 'desc')
+                ->orderBy('id', 'asc')
                 ->get();
         } else {
             // Jika admin/petugas, tampilkan semua pengaduan
             $pengaduans = Pengaduan::with(['pelapor.alamat', 'korban'])
-                ->orderBy('created_at', 'desc')
+                ->orderBy('id', 'asc')
                 ->get();
         }
 
@@ -53,7 +53,7 @@ class TrackingController extends Controller
         $pengaduan = Pengaduan::with(['pelapor.alamat', 'korban'])
             ->findOrFail($id);
             
-        return view('Pelapor.tracking-edit', compact('pengaduan'));
+        return view('tracking.edit', compact('pengaduan'));
     }
 
     public function updateStatus(Request $request, $id)
@@ -64,7 +64,7 @@ class TrackingController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:menunggu,diproses,selesai,di_reskrim,di_kejaksaan'
+            'status' => 'required|in:menunggu,diproses,selesai,ditolak'
         ]);
 
         $pengaduan = Pengaduan::findOrFail($id);
@@ -83,6 +83,6 @@ class TrackingController extends Controller
             'keterangan' => $request->keterangan
         ]);
 
-        return redirect()->route('tracking.index')->with('success', 'Status pengaduan berhasil diperbarui');
+        return redirect()->route('pengaduan.show', $pengaduan->id)->with('success', 'Status pengaduan berhasil diperbarui');
     }
 } 

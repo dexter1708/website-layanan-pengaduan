@@ -15,31 +15,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6">
                     <form method="GET" action="{{ route('data-dashboard.index') }}" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Jumlah Korban</label>
-                                <select name="jumlah_korban" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option value="">Semua</option>
-                                    @foreach($jumlahKorbanOptions as $jumlah)
-                                        <option value="{{ $jumlah }}" {{ request('jumlah_korban') == $jumlah ? 'selected' : '' }}>
-                                            {{ $jumlah }} Korban
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Bentuk Kekerasan</label>
-                                <select name="bentuk_kekerasan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option value="">Semua</option>
-                                    @foreach($bentukKekerasanOptions as $bentuk)
-                                        <option value="{{ $bentuk }}" {{ request('bentuk_kekerasan') == $bentuk ? 'selected' : '' }}>
-                                            {{ $bentuk }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Status</label>
                                 <select name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -100,14 +76,6 @@
                     <div class="p-6">
                         <h3 class="text-lg font-semibold mb-4">Status Pengaduan</h3>
                         <canvas id="statusChart" height="300"></canvas>
-                    </div>
-                </div>
-
-                <!-- Grafik Bentuk Kekerasan -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-4">Bentuk Kekerasan</h3>
-                        <canvas id="bentukKekerasanChart" height="300"></canvas>
                     </div>
                 </div>
 
@@ -291,7 +259,6 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelapor</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Korban</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bentuk Kekerasan</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
@@ -305,30 +272,24 @@
                                         {{ $pengaduan->pelapor->nama_pelapor ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $pengaduan->korban->count() }}
+                                        {{ $pengaduan->korban ? '1' : '0' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $pengaduan->bentuk_kekerasan ?: 'Tidak Diketahui' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                             @if($pengaduan->status == 'menunggu') bg-yellow-100 text-yellow-800
-                                            @elseif($pengaduan->status == 'diproses') bg-orange-100 text-orange-800
+                                            @elseif($pengaduan->status == 'diproses') bg-blue-100 text-blue-800
                                             @elseif($pengaduan->status == 'selesai') bg-green-100 text-green-800
-                                            @else bg-gray-100 text-gray-800
-                                            @endif">
+                                            @else bg-gray-100 text-gray-800 @endif">
                                             {{ ucfirst($pengaduan->status) }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="{{ route('pengaduan.show', $pengaduan->id) }}" class="text-indigo-600 hover:text-indigo-900">Detail</a>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                        Tidak ada pengaduan terbaru
-                                    </td>
+                                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Tidak ada data pengaduan</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -342,18 +303,17 @@
     @push('scripts')
     <script src="{{ asset('js/dashboard-charts.js') }}"></script>
     <script>
-        // Inisialisasi chart dengan data dari controller
         document.addEventListener('DOMContentLoaded', function() {
-            DashboardCharts.initialize(
-                {
-                    labels: {!! json_encode($pengaduanByStatus->keys()->map(function($status) { return ucfirst($status); })) !!},
-                    values: {!! json_encode($pengaduanByStatus->values()) !!}
-                },
-                {
-                    labels: {!! json_encode($pengaduanByBentukKekerasan->keys()) !!},
-                    values: {!! json_encode($pengaduanByBentukKekerasan->values()) !!}
-                }
-            );
+            if (typeof DashboardCharts !== 'undefined' && document.getElementById('statusChart')) {
+                const labels = @json(array_keys($pengaduanByStatus));
+                const values = @json(array_values($pengaduanByStatus));
+                
+                const statusData = {
+                    labels: labels,
+                    values: values
+                };
+                DashboardCharts.initialize(statusData);
+            }
         });
     </script>
     @endpush

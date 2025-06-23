@@ -26,7 +26,7 @@ class Korban extends Model
 
     public function konseling()
     {
-        return $this->hasMany(Konseling::class);
+        return $this->hasOne(Konseling::class);
     }
 }
 

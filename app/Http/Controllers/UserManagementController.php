@@ -32,6 +32,7 @@ class UserManagementController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'nik' => ['required', 'string', 'unique:users,nik'],
+            'no_telepon' => ['nullable', 'string', 'max:20'],
         ]);
 
         User::create([
@@ -39,10 +40,11 @@ class UserManagementController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'nik' => $request->nik,
+            'no_telepon' => $request->no_telepon,
             'role' => 'staff',
         ]);
 
-        return redirect()->route('staff.index')
+        return redirect()->route('admin.staff.index')
             ->with('success', 'Akun staff berhasil dibuat.');
     }
 
@@ -62,6 +64,7 @@ class UserManagementController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id],
             'nik' => ['required', 'string', 'unique:users,nik,' . $id],
+            'no_telepon' => ['nullable', 'string', 'max:20'],
         ];
 
         // Only validate password if it's being changed
@@ -75,6 +78,7 @@ class UserManagementController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'nik' => $request->nik,
+            'no_telepon' => $request->no_telepon,
         ];
 
         if ($request->filled('password')) {
@@ -83,7 +87,7 @@ class UserManagementController extends Controller
 
         $staff->update($updateData);
 
-        return redirect()->route('staff.index')
+        return redirect()->route('admin.staff.index')
             ->with('success', 'Data staff berhasil diperbarui.');
     }
 
@@ -93,7 +97,7 @@ class UserManagementController extends Controller
         $staff = User::where('role', 'staff')->findOrFail($id);
         $staff->delete();
 
-        return redirect()->route('staff.index')
+        return redirect()->route('admin.staff.index')
             ->with('success', 'Akun staff berhasil dihapus.');
     }
 

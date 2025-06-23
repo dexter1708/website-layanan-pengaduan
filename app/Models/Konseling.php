@@ -6,7 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Konseling extends Model
 {
+    const STATUS_BUTUH_KONFIRMASI_STAFF = 'butuh_konfirmasi_staff';
+    const STATUS_MENUNGGU_KONFIRMASI_USER = 'menunggu_konfirmasi_user';
+    const STATUS_TERKONFIRMASI = 'terkonfirmasi';
+    const STATUS_DIBATALKAN = 'dibatalkan';
+
     protected $table = 'konseling';
+    protected $appends = ['status_label', 'status_badge_class'];
     protected $fillable = [
         'pengaduan_id', 
         'korban_id', 
@@ -39,17 +45,30 @@ class Konseling extends Model
         return $this->jenis_layanan;
     }
 
-    public function getStatusLabel()
+    public function getStatusLabelAttribute()
     {
-        $labels = [
-            'butuh_konfirmasi_staff' => 'Butuh Konfirmasi Staff',
-            'menunggu_konfirmasi_user' => 'Menunggu Konfirmasi User',
-            'menunggu' => 'Menunggu',
-            'setuju' => 'Setuju',
-            'tolak' => 'Tolak',
-        ];
+        return match ($this->konfirmasi) {
+            self::STATUS_BUTUH_KONFIRMASI_STAFF => 'Menunggu Konfirmasi Staff',
+            self::STATUS_MENUNGGU_KONFIRMASI_USER => 'Menunggu Konfirmasi Anda',
+            self::STATUS_TERKONFIRMASI => 'Terkonfirmasi',
+            self::STATUS_DIBATALKAN => 'Dibatalkan',
+            'setuju' => 'Terkonfirmasi', // Fallback for old data
+            'tolak' => 'Dibatalkan', // Fallback for old data
+            default => 'Tidak Diketahui',
+        };
+    }
 
-        return $labels[$this->konfirmasi] ?? $this->konfirmasi;
+    public function getStatusBadgeClassAttribute()
+    {
+        return match ($this->konfirmasi) {
+            self::STATUS_BUTUH_KONFIRMASI_STAFF => 'bg-yellow-500',
+            self::STATUS_MENUNGGU_KONFIRMASI_USER => 'bg-blue-500',
+            self::STATUS_TERKONFIRMASI => 'bg-green-500',
+            self::STATUS_DIBATALKAN => 'bg-red-500',
+            'setuju' => 'bg-green-500', // Fallback for old data
+            'tolak' => 'bg-red-500', // Fallback for old data
+            default => 'bg-gray-400',
+        };
     }
 
     // Helper methods for Indonesian date formatting

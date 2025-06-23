@@ -1,265 +1,196 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Buat Pengaduan Baru') }}
-        </h2>
-    </x-slot>
+@extends('template.main')
+@section('content_template')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    @if ($errors->any())
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+<style>
+    .form-input {
+        width: 100%;
+        background-color: #f0f8ff;
+        color: #333;
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        transition: border-color 0.2s;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+    }
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .status-menunggu { background-color: #fef3c7; color: #92400e; }
+    .status-proses { background-color: #dbeafe; color: #1e40af; }
+    .status-selesai { background-color: #d1fae5; color: #065f46; }
+    .status-ditolak { background-color: #fee2e2; color: #991b1b; }
+</style>
 
-                    <form action="{{ route('pengaduan.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        
-                        <!-- Informasi Pelapor (Read-only) -->
-                        <div class="mb-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Informasi Pelapor</h3>
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Nama</label>
-                                        <p class="mt-1 text-sm text-gray-900">{{ $user->name }}</p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Email</label>
-                                        <p class="mt-1 text-sm text-gray-900">{{ $user->email }}</p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Telepon</label>
-                                        <p class="mt-1 text-sm text-gray-900">{{ $user->telepon }}</p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                                        <p class="mt-1 text-sm text-gray-900">{{ $user->alamat }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<section class="bg-white py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-600 font-semibold mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+            <li><a href="{{ url('/') }}" class="text-blue-600 hover:underline">Homepage</a></li>
+            <li class="text-gray-600">/</li>
+            <li><a href="{{ route('pengaduan.index') }}" class="text-blue-600 hover:underline">Layanan Pengaduan</a></li>
+            <li class="text-gray-600">/</li>
+            <li class="text-gray-500">Buat Pengaduan Baru</li>
+        </ol>
+    </nav>
 
-                        <!-- Informasi Pengaduan -->
-                        <div class="mb-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Informasi Pengaduan</h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="judul" class="block text-sm font-medium text-gray-700">Judul Pengaduan</label>
-                                    <input type="text" name="judul" id="judul" value="{{ old('judul') }}" 
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                </div>
+    <!-- Main Form -->
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Buat Pengaduan Baru</h2>
+            <p class="text-sm text-gray-600 mt-1">Silakan isi detail identitas korban dan informasi kejadian.</p>
+        </div>
 
-                                <div>
-                                    <label for="kategori" class="block text-sm font-medium text-gray-700">Kategori</label>
-                                    <select name="kategori" id="kategori" 
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                        <option value="">Pilih Kategori</option>
-                                        <option value="kekerasan_fisik" {{ old('kategori') == 'kekerasan_fisik' ? 'selected' : '' }}>Kekerasan Fisik</option>
-                                        <option value="kekerasan_psikis" {{ old('kategori') == 'kekerasan_psikis' ? 'selected' : '' }}>Kekerasan Psikis</option>
-                                        <option value="kekerasan_seksual" {{ old('kategori') == 'kekerasan_seksual' ? 'selected' : '' }}>Kekerasan Seksual</option>
-                                        <option value="penelantaran" {{ old('kategori') == 'penelantaran' ? 'selected' : '' }}>Penelantaran</option>
-                                        <option value="lainnya" {{ old('kategori') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
-                                    </select>
-                                </div>
-                            </div>
+        <form action="{{ route('pengaduan.store') }}" method="POST" class="p-6">
+            @csrf
 
-                            <div class="mt-4">
-                                <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi Kejadian</label>
-                                <textarea name="deskripsi" id="deskripsi" rows="4" 
-                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>{{ old('deskripsi') }}</textarea>
-                            </div>
+            @if ($errors->any())
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6" role="alert">
+                    <p class="font-bold mb-2">Terjadi Kesalahan</p>
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                <div>
-                                    <label for="tanggal_kejadian" class="block text-sm font-medium text-gray-700">Tanggal Kejadian</label>
-                                    <input type="date" name="tanggal_kejadian" id="tanggal_kejadian" value="{{ old('tanggal_kejadian') }}" 
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                </div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-6 border-l-4 border-blue-500 pl-4">Identitas Korban</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <!-- Nama Lengkap -->
+                <div>
+                    <label for="korban_nama" class="form-label">Nama Lengkap *</label>
+                    <input type="text" id="korban_nama" name="korban[nama]" value="{{ old('korban.nama') }}" class="form-input" placeholder="Masukkan nama lengkap korban" required>
+                </div>
 
-                                <div>
-                                    <label for="lokasi_kejadian" class="block text-sm font-medium text-gray-700">Lokasi Kejadian</label>
-                                    <input type="text" name="lokasi_kejadian" id="lokasi_kejadian" value="{{ old('lokasi_kejadian') }}" 
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                </div>
-                            </div>
+                <!-- Jenis Kelamin -->
+                <div>
+                    <label for="korban_jenis_kelamin" class="form-label">Jenis Kelamin *</label>
+                    <select id="korban_jenis_kelamin" name="korban[jenis_kelamin]" class="form-input" required>
+                        <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                        <option value="Laki-laki" {{ old('korban.jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="Perempuan" {{ old('korban.jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                </div>
 
-                            <!-- Wilayah Kejadian -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                                <div>
-                                    <label for="kota_id" class="block text-sm font-medium text-gray-700">Kota/Kabupaten</label>
-                                    <select name="kota_id" id="kota_id" 
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                        <option value="">Pilih Kota</option>
-                                        @foreach($kotas as $kota)
-                                            <option value="{{ $kota->kota_id }}" {{ old('kota_id') == $kota->kota_id ? 'selected' : '' }}>
-                                                {{ $kota->kota_nama }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                <!-- Disabilitas -->
+                <div>
+                    <label for="korban_disabilitas" class="form-label">Disabilitas *</label>
+                    <select id="korban_disabilitas" name="korban[disabilitas]" class="form-input" required>
+                        <option value="" disabled selected>Pilih Status Disabilitas</option>
+                        <option value="Tidak" {{ old('korban.disabilitas', 'Tidak') == 'Tidak' ? 'selected' : '' }}>Tidak</option>
+                        <option value="Ya" {{ old('korban.disabilitas') == 'Ya' ? 'selected' : '' }}>Ya</option>
+                    </select>
+                </div>
 
-                                <div>
-                                    <label for="kecamatan_id" class="block text-sm font-medium text-gray-700">Kecamatan</label>
-                                    <select name="kecamatan_id" id="kecamatan_id" 
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                        <option value="">Pilih Kecamatan</option>
-                                    </select>
-                                </div>
+                <!-- Usia saat Kejadian -->
+                <div>
+                    <label for="korban_usia" class="form-label">Usia saat Kejadian *</label>
+                    <input type="number" id="korban_usia" name="korban[usia]" value="{{ old('korban.usia') }}" class="form-input" placeholder="Masukkan usia korban" required min="0">
+                </div>
 
-                                <div>
-                                    <label for="desa_id" class="block text-sm font-medium text-gray-700">Desa/Kelurahan</label>
-                                    <select name="desa_id" id="desa_id" 
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                        <option value="">Pilih Desa</option>
-                                    </select>
-                                </div>
-                            </div>
+                <!-- Pendidikan -->
+                <div>
+                    <label for="korban_pendidikan" class="form-label">Pendidikan *</label>
+                    <select id="korban_pendidikan" name="korban[pendidikan]" class="form-input" required>
+                        <option value="">-- Pilih Pendidikan --</option>
+                        <option value="Tidak Sekolah" {{ old('korban.pendidikan') == 'Tidak Sekolah' ? 'selected' : '' }}>Tidak Sekolah</option>
+                        <option value="SD" {{ old('korban.pendidikan') == 'SD' ? 'selected' : '' }}>SD</option>
+                        <option value="SMP" {{ old('korban.pendidikan') == 'SMP' ? 'selected' : '' }}>SMP</option>
+                        <option value="SMA" {{ old('korban.pendidikan') == 'SMA' ? 'selected' : '' }}>SMA</option>
+                        <option value="D3" {{ old('korban.pendidikan') == 'D3' ? 'selected' : '' }}>D3</option>
+                        <option value="S1" {{ old('korban.pendidikan') == 'S1' ? 'selected' : '' }}>S1</option>
+                        <option value="S2" {{ old('korban.pendidikan') == 'S2' ? 'selected' : '' }}>S2</option>
+                        <option value="S3" {{ old('korban.pendidikan') == 'S3' ? 'selected' : '' }}>S3</option>
+                    </select>
+                </div>
 
-                            <div class="mt-4">
-                                <label for="bukti" class="block text-sm font-medium text-gray-700">Bukti Pendukung (Opsional)</label>
-                                <input type="file" name="bukti" id="bukti" 
-                                       class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                                       accept=".jpg,.jpeg,.png,.pdf">
-                                <p class="mt-1 text-sm text-gray-500">Format: JPG, JPEG, PNG, PDF (Max: 2MB)</p>
-                            </div>
-                        </div>
+                <!-- Pekerjaan -->
+                <div>
+                    <label for="korban_pekerjaan" class="form-label">Pekerjaan *</label>
+                    <select id="korban_pekerjaan" name="korban[pekerjaan]" class="form-input" required>
+                        <option value="">-- Pilih Pekerjaan --</option>
+                        @foreach ($pekerjaan as $p)
+                            <option value="{{ $p->pekerjaan }}" {{ old('korban.pekerjaan') == $p->pekerjaan ? 'selected' : '' }}>{{ $p->pekerjaan }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-                        <!-- Informasi Korban -->
-                        <div class="mb-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Informasi Korban</h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="nama_korban" class="block text-sm font-medium text-gray-700">Nama Korban</label>
-                                    <input type="text" name="nama_korban" id="nama_korban" value="{{ old('nama_korban') }}" 
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                </div>
+                <!-- Status Perkawinan -->
+                <div>
+                    <label for="korban_status_perkawinan" class="form-label">Status Perkawinan *</label>
+                    <select id="korban_status_perkawinan" name="korban[status_perkawinan]" class="form-input" required>
+                        <option value="">-- Pilih Status Perkawinan --</option>
+                        <option value="Belum Kawin" {{ old('korban.status_perkawinan') == 'Belum Kawin' ? 'selected' : '' }}>Belum Kawin</option>
+                        <option value="Kawin" {{ old('korban.status_perkawinan') == 'Kawin' ? 'selected' : '' }}>Kawin</option>
+                        <option value="Cerai Hidup" {{ old('korban.status_perkawinan') == 'Cerai Hidup' ? 'selected' : '' }}>Cerai Hidup</option>
+                        <option value="Cerai Mati" {{ old('korban.status_perkawinan') == 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
+                    </select>
+                </div>
 
-                                <div>
-                                    <label for="umur_korban" class="block text-sm font-medium text-gray-700">Umur Korban</label>
-                                    <input type="number" name="umur_korban" id="umur_korban" value="{{ old('umur_korban') }}" 
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                </div>
-                            </div>
+                <!-- No Handphone -->
+                <div>
+                    <label for="korban_no_telepon" class="form-label">No Handphone *</label>
+                    <input type="tel" id="korban_no_telepon" name="korban[no_telepon]" value="{{ old('korban.no_telepon') }}" class="form-input" placeholder="Contoh: 08123456789" required>
+                </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                <div>
-                                    <label for="no_telepon_korban" class="block text-sm font-medium text-gray-700">Nomor Telepon Korban</label>
-                                    <input type="tel" name="no_telepon_korban" id="no_telepon_korban" value="{{ old('no_telepon_korban') }}" 
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
-                                           placeholder="08xxxxxxxxxx" required>
-                                </div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2 border-l-4 border-blue-500 pl-4 md:col-span-2 mt-6">Informasi Kejadian</h3>
 
-                                <div>
-                                    <label for="jenis_kelamin_korban" class="block text-sm font-medium text-gray-700">Jenis Kelamin Korban</label>
-                                    <select name="jenis_kelamin_korban" id="jenis_kelamin_korban" 
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                        <option value="">Pilih Jenis Kelamin</option>
-                                        <option value="L" {{ old('jenis_kelamin_korban') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                                        <option value="P" {{ old('jenis_kelamin_korban') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                                    </select>
-                                </div>
-                            </div>
+                <!-- Tempat Kejadian -->
+                <div>
+                    <label for="tempat_kejadian" class="form-label">Tempat Kejadian *</label>
+                    <input type="text" id="tempat_kejadian" name="tempat_kejadian" value="{{ old('tempat_kejadian') }}" class="form-input" placeholder="Contoh: Jl. Merdeka No. 10" required>
+                </div>
+                
+                <!-- Tanggal Kejadian -->
+                <div>
+                    <label for="tanggal_kejadian" class="form-label">Tanggal Kejadian *</label>
+                    <input type="date" id="tanggal_kejadian" name="tanggal_kejadian" value="{{ old('tanggal_kejadian') }}" class="form-input" required>
+                </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                <div>
-                                    <label for="hubungan_dengan_korban" class="block text-sm font-medium text-gray-700">Hubungan dengan Korban</label>
-                                    <select name="hubungan_dengan_korban" id="hubungan_dengan_korban" 
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                        <option value="">Pilih Hubungan</option>
-                                        <option value="keluarga" {{ old('hubungan_dengan_korban') == 'keluarga' ? 'selected' : '' }}>Keluarga</option>
-                                        <option value="tetangga" {{ old('hubungan_dengan_korban') == 'tetangga' ? 'selected' : '' }}>Tetangga</option>
-                                        <option value="teman" {{ old('hubungan_dengan_korban') == 'teman' ? 'selected' : '' }}>Teman</option>
-                                        <option value="lainnya" {{ old('hubungan_dengan_korban') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="mt-4">
-                                <label for="alamat_korban" class="block text-sm font-medium text-gray-700">Alamat Korban</label>
-                                <textarea name="alamat_korban" id="alamat_korban" rows="2" 
-                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>{{ old('alamat_korban') }}</textarea>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-end">
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-                                Kirim Pengaduan
-                            </button>
-                        </div>
-                    </form>
+                <!-- Kecamatan -->
+                <div class="md:col-span-2">
+                    <label for="kecamatan_kejadian" class="form-label">Kecamatan *</label>
+                    <select id="kecamatan_kejadian" name="kecamatan_kejadian" class="form-input" required>
+                        <option value="">-- Pilih Kecamatan --</option>
+                        @foreach ($kecamatans as $kecamatan)
+                            <option value="{{ $kecamatan->kecamatan_id }}">{{ $kecamatan->kecamatan_nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <!-- Kronologi Singkat -->
+                <div class="md:col-span-2">
+                    <label for="kronologi" class="form-label">Kronologi Singkat *</label>
+                    <textarea id="kronologi" name="kronologi" rows="5" class="form-input" placeholder="Deskripsikan kronologi kejadian secara singkat dan jelas" required>{{ old('kronologi') }}</textarea>
                 </div>
             </div>
-        </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end items-center mt-8 gap-4">
+                <a href="{{ route('pengaduan.index') }}" class="bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                    Batal
+                </a>
+                <button type="submit" class="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Simpan
+                </button>
+            </div>
+        </form>
     </div>
+</section>
 
-    @push('scripts')
-    <script>
-        // Handle dynamic wilayah selection
-        document.getElementById('kota_id').addEventListener('change', function() {
-            const kotaId = this.value;
-            const kecamatanSelect = document.getElementById('kecamatan_id');
-            const desaSelect = document.getElementById('desa_id');
-
-            // Clear kecamatan and desa options
-            kecamatanSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
-            desaSelect.innerHTML = '<option value="">Pilih Desa</option>';
-
-            if (kotaId) {
-                fetch(`/api/kecamatan/${kotaId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(kecamatan => {
-                            const option = new Option(kecamatan.nama, kecamatan.id);
-                            kecamatanSelect.add(option);
-                        });
-                    });
-            }
-        });
-
-        document.getElementById('kecamatan_id').addEventListener('change', function() {
-            const kecamatanId = this.value;
-            const desaSelect = document.getElementById('desa_id');
-
-            // Clear desa options
-            desaSelect.innerHTML = '<option value="">Pilih Desa</option>';
-
-            if (kecamatanId) {
-                fetch(`/api/desa/${kecamatanId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(desa => {
-                            const option = new Option(desa.nama, desa.id);
-                            desaSelect.add(option);
-                        });
-                    });
-            }
-        });
-
-        // Initialize wilayah selection if there are old values
-        @if(old('kota_id'))
-            document.getElementById('kota_id').dispatchEvent(new Event('change'));
-            @if(old('kecamatan_id'))
-                setTimeout(() => {
-                    document.getElementById('kecamatan_id').value = '{{ old('kecamatan_id') }}';
-                    document.getElementById('kecamatan_id').dispatchEvent(new Event('change'));
-                    @if(old('desa_id'))
-                        setTimeout(() => {
-                            document.getElementById('desa_id').value = '{{ old('desa_id') }}';
-                        }, 500);
-                    @endif
-                }, 500);
-            @endif
-        @endif
-    </script>
-    @endpush
-</x-app-layout> 
+@endsection 

@@ -16,7 +16,7 @@ class StaffMiddleware
             'role' => Auth::user()->role ?? 'not logged in'
         ]);
 
-        if (Auth::check() && Auth::user()->role === 'staff') {
+        if (Auth::check() && (Auth::user()->role === 'staff' || Auth::user()->role === 'super_admin')) {
             return $next($request);
         }
 

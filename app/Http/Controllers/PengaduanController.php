@@ -11,38 +11,57 @@ use App\Models\Pekerjaan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\Korban;
+use App\Models\Pelaku;
 
 class PengaduanController extends Controller
 {
+    public function index()
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'staff') {
+            $pengaduans = Pengaduan::with(['korban'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+            return view('pengaduan_staf_dinas.index', compact('pengaduans'));
+        }
+        
+        if ($user->role === 'pelapor') {
+            $pengaduans = Pengaduan::with(['korban', 'historiTracking'])
+                ->where('user_id', $user->id)
+                ->orderBy('id', 'asc')
+                ->get();
+            return view('pengaduan.index', compact('pengaduans'));
+        }
+
+        abort(403, 'Anda tidak memiliki izin untuk mengakses halaman ini.');
+    }
+
     // Menampilkan form pengaduan dan memilih kota
     public function create()
     {
-        $user = Auth::user();
-        
-        // Ambil riwayat pengaduan user (maksimal 5 terbaru)
-        $riwayatPengaduan = Pengaduan::with(['korban', 'pelaku', 'historiTracking'])
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
-        
-        // Ambil data kota untuk dropdown
-        $kotas = Wilayah::select('kota_id', 'kota_nama')->distinct()->get();
-        
-        // Ambil data bentuk kekerasan dan pekerjaan
-        $bentukKekerasan = BentukKekerasan::all();
+        if (Auth::user()->role !== 'pelapor') {
+            abort(403, 'Hanya pelapor yang dapat membuat pengaduan.');
+        }
+        $kecamatans = Wilayah::select('kecamatan_id', 'kecamatan_nama')
+                             ->whereNotNull('kecamatan_nama')
+                             ->groupBy('kecamatan_id', 'kecamatan_nama')
+                             ->orderBy('kecamatan_nama')
+                             ->get();
         $pekerjaan = Pekerjaan::all();
         
-        return view('pelapor.pengaduan', compact('kotas', 'bentukKekerasan', 'pekerjaan', 'riwayatPengaduan'));
+        return view('pengaduan.create', compact('kecamatans', 'pekerjaan'));
     }
-    
+
     // Menampilkan detail pengaduan
     public function show($id)
     {
         $user = Auth::user();
-        $pengaduan = Pengaduan::with(['pelapor', 'korban', 'pelaku', 'historiTracking.changedByUser', 'user.alamat'])
+        $pengaduan = Pengaduan::with(['pelapor', 'korban', 'historiTracking.changedByUser', 'user.alamat'])
             ->findOrFail($id);
-
+            
         // Pastikan user hanya bisa melihat pengaduan miliknya (jika role pelapor)
         if ($user->role === 'pelapor' && $pengaduan->user_id !== $user->id) {
             abort(403, 'Unauthorized action.');
@@ -50,43 +69,36 @@ class PengaduanController extends Controller
 
         return view('pengaduan.show', compact('pengaduan'));
     }
-    
-    // Menampilkan riwayat pengaduan user
-    public function riwayat(Request $request)
+
+    // Menampilkan riwayat pengaduan user (halaman utama pengaduan)
+    public function riwayat()
     {
+        if (Auth::user()->role !== 'pelapor') {
+            abort(403, 'Hanya pelapor yang dapat melihat riwayat pengaduan.');
+        }
         $user = Auth::user();
-        
-        $query = Pengaduan::with(['korban', 'pelaku', 'historiTracking'])
+
+        $pengaduans = Pengaduan::with(['korban', 'historiTracking'])
             ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc');
-            
-        // Filter berdasarkan tanggal jika ada
-        if ($request->filled('dari')) {
-            $query->where('created_at', '>=', $request->dari);
-        }
-        
-        if ($request->filled('sampai')) {
-            $query->where('created_at', '<=', $request->sampai . ' 23:59:59');
-        }
-        
-        $pengaduans = $query->get();
-        
-        return view('pelapor.riwayat', compact('pengaduans'));
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pengaduan.riwayat', compact('pengaduans'));
     }
-    
+
     // Menyimpan data pengaduan dan pelapor
     public function store(Request $request)
     {
+        if (Auth::user()->role !== 'pelapor') {
+            abort(403, 'Hanya pelapor yang dapat mengajukan pengaduan.');
+        }
+        
         $rules = [
             // Data pengaduan
             'tempat_kejadian' => 'required|string|max:255',
             'kecamatan_kejadian' => 'required',
-            'desa_kejadian' => 'required',
             'tanggal_kejadian' => 'required|date',
-            'jenis_laporan' => 'required|string|max:255',
             'kronologi' => 'required|string',
-            'jenis_kasus' => 'required|string|max:255',
-            'bentuk_kekerasan' => 'required|string|max:255',
 
             // Data korban
             'korban.nama' => 'required|string|max:255',
@@ -97,28 +109,15 @@ class PengaduanController extends Controller
             'korban.pendidikan' => 'required|in:Tidak Sekolah,SD,SMP,SMA,D3,S1,S2,S3',
             'korban.status_perkawinan' => 'required|in:Belum Kawin,Kawin,Cerai Hidup,Cerai Mati',
             'korban.pekerjaan' => 'required|exists:pekerjaan,pekerjaan',
-
-            // Data pelaku
-            'pelaku.nama' => 'required|string|max:255',
-            'pelaku.jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'pelaku.usia' => 'required|integer|min:0',
-            'pelaku.pendidikan' => 'required|in:Tidak Sekolah,SD,SMP,SMA,D3,S1,S2,S3',
-            'pelaku.hubungan' => 'required|in:Orang Tua,Saudara,Pasangan,Tetangga,Teman,Lainnya',
-            'pelaku.kewarganegaraan' => 'required|in:WNI,WNA',
-            'pelaku.pekerjaan' => 'required|exists:pekerjaan,pekerjaan',
         ];
 
         $messages = [
             // Pesan error untuk data pengaduan
             'tempat_kejadian.required' => 'Tempat kejadian harus diisi.',
             'kecamatan_kejadian.required' => 'Kecamatan kejadian harus dipilih.',
-            'desa_kejadian.required' => 'Desa kejadian harus dipilih.',
             'tanggal_kejadian.required' => 'Tanggal kejadian harus diisi.',
             'tanggal_kejadian.date' => 'Format tanggal kejadian tidak valid.',
-            'jenis_laporan.required' => 'Jenis laporan harus dipilih.',
             'kronologi.required' => 'Kronologi harus diisi.',
-            'jenis_kasus.required' => 'Jenis kasus harus dipilih.',
-            'bentuk_kekerasan.required' => 'Bentuk kekerasan harus dipilih.',
 
             // Pesan error untuk data korban
             'korban.nama.required' => 'Nama korban harus diisi.',
@@ -133,26 +132,14 @@ class PengaduanController extends Controller
             'korban.status_perkawinan.required' => 'Status perkawinan korban harus dipilih.',
             'korban.pekerjaan.required' => 'Pekerjaan korban harus dipilih.',
             'korban.pekerjaan.exists' => 'Pekerjaan korban yang dipilih tidak valid.',
-
-            // Pesan error untuk data pelaku
-            'pelaku.nama.required' => 'Nama pelaku harus diisi.',
-            'pelaku.jenis_kelamin.required' => 'Jenis kelamin pelaku harus dipilih.',
-            'pelaku.usia.required' => 'Usia pelaku harus diisi.',
-            'pelaku.usia.integer' => 'Usia pelaku harus berupa angka.',
-            'pelaku.usia.min' => 'Usia pelaku tidak boleh kurang dari 0.',
-            'pelaku.pendidikan.required' => 'Pendidikan pelaku harus dipilih.',
-            'pelaku.hubungan.required' => 'Hubungan dengan korban harus dipilih.',
-            'pelaku.kewarganegaraan.required' => 'Kewarganegaraan pelaku harus dipilih.',
-            'pelaku.pekerjaan.required' => 'Pekerjaan pelaku harus dipilih.',
-            'pelaku.pekerjaan.exists' => 'Pekerjaan pelaku yang dipilih tidak valid.',
         ];
 
         $request->validate($rules, $messages);
 
-        // Validate and get the wilayah for kejadian
-        $wilayahKejadian = Wilayah::where('kecamatan_id', $request->kecamatan_kejadian)
-                                 ->where('desa_id', $request->desa_kejadian)
-                                 ->firstOrFail();
+        // Get kecamatan info
+        $kecamatanInfo = Wilayah::where('kecamatan_id', $request->kecamatan_kejadian)
+                                ->whereNotNull('kecamatan_nama')
+                                ->firstOrFail();
 
         DB::beginTransaction();
         try {
@@ -167,12 +154,8 @@ class PengaduanController extends Controller
                 'user_id' => $user->id,
                 'tempat_kejadian' => $request->tempat_kejadian,
                 'tanggal_kejadian' => $request->tanggal_kejadian,
-                'jenis_laporan' => $request->jenis_laporan,
                 'kronologi' => $request->kronologi,
-                'jenis_kasus' => $request->jenis_kasus,
-                'bentuk_kekerasan' => $request->bentuk_kekerasan,
-                'kecamatan' => $wilayahKejadian->kecamatan_nama,
-                'desa' => $wilayahKejadian->desa_nama,
+                'kecamatan' => $kecamatanInfo->kecamatan_nama,
                 'status' => 'menunggu',
             ]);
 
@@ -199,10 +182,9 @@ class PengaduanController extends Controller
             ]);
 
             // Create korban data
-            $korban = $pengaduan->korban()->create($request->korban);
-
-            // Create pelaku data
-            $pelaku = $pengaduan->pelaku()->create($request->pelaku);
+            $korbanData = $request->korban;
+            $korbanData['pengaduan_id'] = $pengaduan->id;
+            Korban::create($korbanData);
 
             DB::commit();
             return redirect()->route('pengaduan.show', $pengaduan->id)->with('success', 'Pengaduan berhasil diajukan! Silakan lihat detail pengaduan Anda di bawah ini.');
@@ -213,5 +195,17 @@ class PengaduanController extends Controller
                            ->withInput()
                            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    public function destroy($id)
+    {
+        if (Auth::user()->role !== 'staff') {
+            abort(403, 'Anda tidak memiliki izin untuk melakukan tindakan ini.');
+        }
+
+        $pengaduan = Pengaduan::findOrFail($id);
+        $pengaduan->delete();
+
+        return redirect()->route('pengaduan.index')->with('success', 'Pengaduan berhasil dihapus.');
     }
 }

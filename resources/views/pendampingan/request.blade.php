@@ -1,202 +1,145 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Ajukan Pendampingan') }}
-        </h2>
-    </x-slot>
+@extends('template.main')
+@section('content_template')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('user.pendampingan.request') }}" class="space-y-6">
-                        @csrf
+<section class="bg-white py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-600 font-semibold mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+            <li><a href="{{ url('/') }}" class="text-blue-600 hover:underline">Homepage</a></li>
+            <li class="text-gray-600">/</li>
+            <li><a href="#" class="text-blue-600 hover:underline">Layanan</a></li>
+            <li class="text-gray-600">/</li>
+            <li><a href="{{ route('pendampingan.index') }}" class="text-blue-600 hover:underline">Pendampingan</a></li>
+            <li class="text-gray-600">/</li>
+            <li class="text-gray-500">Ajukan Pendampingan</li>
+        </ol>
+    </nav>
 
-                        <!-- ID Pengaduan -->
-                        <div>
-                            <x-input-label for="pengaduan_id" :value="__('Pilih Pengaduan')" />
-                            <select id="pengaduan_id" name="pengaduan_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">Pilih Pengaduan</option>
-                                @foreach($pengaduans as $pengaduan)
-                                    <option value="{{ $pengaduan->id }}" 
-                                            {{ old('pengaduan_id') == $pengaduan->id ? 'selected' : '' }}>
-                                        ID: {{ $pengaduan->id }} - {{ $pengaduan->nama_pelapor ?? 'N/A' }}
-                                        @if($pengaduan->korban && $pengaduan->korban->count() > 0)
-                                            ({{ $pengaduan->korban->count() }} korban)
-                                        @else
-                                            (Belum ada korban)
-                                        @endif
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error class="mt-2" :messages="$errors->get('pengaduan_id')" />
-                        </div>
-
-                        <!-- Nama Korban -->
-                        <div>
-                            <x-input-label for="korban_id" :value="__('Nama Korban')" />
-                            <select id="korban_id" name="korban_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" disabled>
-                                <option value="">Pilih Korban</option>
-                            </select>
-                            <x-input-error class="mt-2" :messages="$errors->get('korban_id')" />
-                            <p id="no-korban-message" class="mt-2 text-sm text-gray-600" style="display: none;">
-                                Pengaduan ini belum memiliki data korban.
-                            </p>
-                        </div>
-
-                        <!-- Jenis Layanan -->
-                        <div>
-                            <x-input-label for="jenis_layanan" :value="__('Jenis Layanan Pendampingan')" />
-                            <select id="jenis_layanan" name="jenis_layanan" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">Pilih Jenis Layanan</option>
-                                @foreach($layanans as $layanan)
-                                    <option value="{{ $layanan->nama_layanan }}" {{ old('jenis_layanan') == $layanan->nama_layanan ? 'selected' : '' }}>
-                                        {{ $layanan->nama_layanan }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error class="mt-2" :messages="$errors->get('jenis_layanan')" />
-                        </div>
-
-                        <!-- Tanggal dan Waktu Pendampingan -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <x-input-label for="tanggal_pendampingan" :value="__('Tanggal Pendampingan')" />
-                                <x-text-input id="tanggal_pendampingan" class="block mt-1 w-full" type="date" name="tanggal_pendampingan" :value="old('tanggal_pendampingan')" required autocomplete="tanggal_pendampingan" />
-                                <p class="mt-1 text-sm text-gray-500">Pilih tanggal (format: DD/MM/YYYY)</p>
-                                <x-input-error class="mt-2" :messages="$errors->get('tanggal_pendampingan')" />
-                            </div>
-                            <div>
-                                <x-input-label for="waktu_pendampingan" :value="__('Waktu Pendampingan')" />
-                                <x-text-input id="waktu_pendampingan" class="block mt-1 w-full" type="time" name="waktu_pendampingan" :value="old('waktu_pendampingan')" required autocomplete="waktu_pendampingan" />
-                                <p class="mt-1 text-sm text-gray-500">Pilih waktu (format: HH:MM dalam 24 jam)</p>
-                                <x-input-error class="mt-2" :messages="$errors->get('waktu_pendampingan')" />
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-4">
-                            <x-primary-button>{{ __('Ajukan Pendampingan') }}</x-primary-button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    @if($pengaduans->isEmpty())
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md shadow-md" role="alert">
+            <p class="font-bold">Informasi</p>
+            <p>Saat ini Anda tidak memiliki pengaduan yang dapat diajukan untuk layanan pendampingan. Semua pengaduan Anda mungkin sudah memiliki jadwal pendampingan.</p>
         </div>
-    </div>
+    @else
+        @if($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-    <!-- Hidden data container for JavaScript -->
-    <div id="pengaduan-data" 
-         data-pengaduan="{{ json_encode($pengaduans->map(function($pengaduan) {
-             return [
-                 'id' => $pengaduan->id,
-                 'korban' => $pengaduan->korban ? $pengaduan->korban->map(function($korban) {
-                     return [
-                         'id' => $korban->id,
-                         'nama' => $korban->nama ?? 'Nama tidak tersedia'
-                     ];
-                 }) : []
-             ];
-         })) }}"
-         style="display: none;">
-    </div>
+        <!-- Form -->
+        <form method="POST" action="{{ route('pendampingan.request.store') }}" class="bg-white shadow-md rounded-lg p-6">
+            @csrf
+            <h2 class="text-lg font-semibold text-gray-800 mb-6">Ajukan Layanan Pendampingan</h2>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const pengaduanSelect = document.getElementById('pengaduan_id');
-            const korbanSelect = document.getElementById('korban_id');
-            const noKorbanMessage = document.getElementById('no-korban-message');
-            const dataContainer = document.getElementById('pengaduan-data');
-            const waktuInput = document.getElementById('waktu_pendampingan');
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Pengaduan -->
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Pilih Pengaduan *</label>
+                    <select name="pengaduan_id" id="pengaduan_id" required
+                        class="w-full bg-blue-50 text-gray-800 px-4 py-2 border-b border-gray-300 focus:outline-none">
+                        <option value="" selected disabled>-- Pilih Pengaduan --</option>
+                        @foreach($pengaduans as $pengaduan)
+                            <option value="{{ $pengaduan->id }}" 
+                                    data-korban-id="{{ $pengaduan->korban->id ?? '' }}"
+                                    data-korban-nama="{{ $pengaduan->korban->nama ?? '' }}"
+                                    {{ old('pengaduan_id') == $pengaduan->id ? 'selected' : '' }}>
+                                ID Pengaduan: {{ $pengaduan->id }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            // Get data from hidden container
-            const pengaduanData = JSON.parse(dataContainer.getAttribute('data-pengaduan'));
+                <!-- Korban -->
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Nama Korban *</label>
+                    <select name="korban_id" id="korban_id" required
+                        class="w-full bg-blue-50 text-gray-800 px-4 py-2 border-b border-gray-300 focus:outline-none" readonly>
+                        <option value="" selected disabled>-- Pilih Pengaduan terlebih dahulu --</option>
+                    </select>
+                </div>
 
-            console.log('Data pengaduan:', pengaduanData); // Debug
+                <!-- Jenis Layanan -->
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Jenis Layanan *</label>
+                    <select name="jenis_layanan" id="jenis_layanan" required
+                        class="w-full bg-blue-50 text-gray-800 px-4 py-2 border-b border-gray-300 focus:outline-none">
+                        <option value="" selected disabled>-- Pilih Jenis Layanan --</option>
+                        @foreach($layanans as $layanan)
+                            <option value="{{ $layanan->nama_layanan }}" {{ old('jenis_layanan') == $layanan->nama_layanan ? 'selected' : '' }}>
+                                {{ $layanan->nama_layanan }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            function updateKorbanOptions() {
-                const selectedPengaduanId = pengaduanSelect.value;
-                
-                // Reset korban dropdown
-                korbanSelect.innerHTML = '<option value="">Pilih Korban</option>';
-                korbanSelect.disabled = true;
-                noKorbanMessage.style.display = 'none';
+                <!-- Tanggal Pendampingan -->
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Tanggal Pendampingan yang Diinginkan *</label>
+                    <input type="date" name="tanggal_pendampingan" value="{{ old('tanggal_pendampingan') }}" required
+                        class="w-full bg-blue-50 text-gray-800 px-4 py-2 border-b border-gray-300 focus:outline-none" />
+                </div>
 
-                if (selectedPengaduanId) {
-                    // Cari pengaduan yang dipilih
-                    const selectedPengaduan = pengaduanData.find(p => p.id == selectedPengaduanId);
-                    
-                    console.log('Pengaduan terpilih:', selectedPengaduan); // Debug
-                    
-                    if (selectedPengaduan) {
-                        if (selectedPengaduan.korban && selectedPengaduan.korban.length > 0) {
-                            // Tambah semua korban untuk pengaduan ini
-                            selectedPengaduan.korban.forEach(function(korban) {
-                                const option = document.createElement('option');
-                                option.value = korban.id;
-                                option.textContent = korban.nama;
-                                korbanSelect.appendChild(option);
-                            });
-                            korbanSelect.disabled = false;
-                        } else {
-                            // Tidak ada korban
-                            noKorbanMessage.style.display = 'block';
-                        }
-                    }
-                }
-            }
+                <!-- Waktu Pendampingan -->
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Waktu Pendampingan yang Diinginkan *</label>
+                     <select name="waktu_pendampingan" required class="w-full bg-blue-50 text-gray-800 px-4 py-2 border-b border-gray-300 focus:outline-none">
+                        <option value="" selected disabled>-- Pilih Waktu --</option>
+                        @for ($i = 8; $i <= 15; $i++)
+                            @php $time = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00'; @endphp
+                            <option value="{{ $time }}" {{ old('waktu_pendampingan') == $time ? 'selected' : '' }}>
+                                {{ $time }} WIB
+                            </option>
+                        @endfor
+                    </select>
+                </div>
 
-            // Format waktu dengan WIB (24 jam)
-            function formatWaktuIndonesia(waktu) {
-                if (!waktu) return '';
-                return `${waktu} WIB`;
-            }
+            <!-- Tombol -->
+            <div class="flex justify-center mt-6 gap-4">
+                <a href="{{ route('pendampingan.index') }}" type="button"
+                    class="bg-blue-400 text-white px-6 py-2 rounded hover:bg-blue-500 transition">
+                    Batal
+                </a>
+                <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+                    Ajukan Pendampingan
+                </button>
+            </div>
+        </form>
+    @endif
+</section>
 
-            // Event listener untuk format waktu
-            waktuInput.addEventListener('change', function() {
-                const waktu = this.value;
-                const waktuFormatted = formatWaktuIndonesia(waktu);
-                
-                // Tampilkan format Indonesia di bawah input
-                let displayElement = document.getElementById('waktu-display');
-                if (!displayElement) {
-                    displayElement = document.createElement('div');
-                    displayElement.id = 'waktu-display';
-                    displayElement.className = 'mt-1 text-sm text-blue-600 font-medium';
-                    this.parentNode.appendChild(displayElement);
-                }
-                
-                if (waktuFormatted) {
-                    displayElement.textContent = `Waktu yang dipilih: ${waktuFormatted}`;
-                } else {
-                    displayElement.textContent = '';
-                }
-            });
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pengaduanSelect = document.getElementById('pengaduan_id');
+    const korbanSelect = document.getElementById('korban_id');
 
-            // Event listener untuk perubahan pengaduan
-            pengaduanSelect.addEventListener('change', updateKorbanOptions);
+    function updateKorbanDropdown() {
+        const pengaduanId = pengaduanSelect.value;
+        korbanSelect.innerHTML = '<option value="" selected disabled>-- Pilih Korban --</option>';
 
-            // Initialize if there are old values
-            const oldPengaduanId = "{{ old('pengaduan_id') }}";
-            const oldKorbanId = "{{ old('korban_id') }}";
-            const oldWaktu = "{{ old('waktu_pendampingan') }}";
+        if (pengaduanId) {
+            const pengaduanOption = pengaduanSelect.options[pengaduanSelect.selectedIndex];
+            const korbanId = pengaduanOption.getAttribute('data-korban-id');
+            const korbanNama = pengaduanOption.getAttribute('data-korban-nama');
             
-            if (oldPengaduanId) {
-                updateKorbanOptions();
-                if (oldKorbanId) {
-                    // Set selected korban if there's old input
-                    setTimeout(function() {
-                        if (oldKorbanId) {
-                            korbanSelect.value = oldKorbanId;
-                        }
-                    }, 100);
-                }
+            if (korbanId && korbanNama) {
+                const option = new Option(korbanNama, korbanId);
+                korbanSelect.add(option);
+                korbanSelect.value = korbanId;
             }
+        }
+    }
 
-            // Trigger waktu format if there's old input
-            if (oldWaktu) {
-                setTimeout(function() {
-                    waktuInput.dispatchEvent(new Event('change'));
-                }, 100);
-            }
-        });
-    </script>
-</x-app-layout>
+    pengaduanSelect.addEventListener('change', updateKorbanDropdown);
+
+    if (pengaduanSelect.value) {
+        updateKorbanDropdown();
+    }
+});
+</script>
+
+@endsection

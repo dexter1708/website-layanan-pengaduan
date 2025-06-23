@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class StaffSeeder extends Seeder
@@ -13,32 +14,41 @@ class StaffSeeder extends Seeder
         $staffs = [
             [
                 'name' => 'Staff Satu',
-                'email' => 'staff1@example.com',
+                'email' => 'stafsatu@example.com',
                 'password' => Hash::make('password123'),
-                'nik' => '1234567890123456',
-                'no_telepon' => '081234567890',
+                'nik' => '123456',
+                'no_telepon' => '123456',
                 'role' => 'staff',
             ],
             [
                 'name' => 'Staff Dua',
-                'email' => 'staff2@example.com',
+                'email' => 'staffdua@example.com',
                 'password' => Hash::make('password123'),
-                'nik' => '2345678901234567',
-                'no_telepon' => '081234567891',
+                'nik' => '1234567',
+                'no_telepon' => '1234567',
                 'role' => 'staff',
             ],
             [
                 'name' => 'Staff Tiga',
-                'email' => 'staff3@example.com',
+                'email' => 'stafftiga@example.com',
                 'password' => Hash::make('password123'),
-                'nik' => '3456789012345678',
-                'no_telepon' => '081234567892',
+                'nik' => '12345678',
+                'no_telepon' => '12345678',
                 'role' => 'staff',
             ],
         ];
 
         foreach ($staffs as $staff) {
-            User::create($staff);
+            // User::create($staff);
+            DB::table('users')->insert([
+                'name' => $staff['name'],
+                'email' => $staff['email'],
+                'password' => $staff['password'],
+                'nik' => $staff['nik'],
+                'no_telepon' => $staff['no_telepon'],
+                'role' => $staff['role'],
+                'email_verified_at' => now(),
+            ]);
         }
     }
 } 

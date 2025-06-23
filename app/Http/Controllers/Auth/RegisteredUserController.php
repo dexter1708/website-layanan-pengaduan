@@ -21,7 +21,11 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        $kotas = Wilayah::select('kota_id', 'kota_nama')->distinct()->get();
+        $kotas = Wilayah::select('kota_id', 'kota_nama')
+                        ->whereNotNull('kota_nama')
+                        ->groupBy('kota_id', 'kota_nama')
+                        ->orderBy('kota_nama')
+                        ->get();
         return view('auth.register', compact('kotas'));
     }
 
@@ -40,14 +44,14 @@ class RegisteredUserController extends Controller
             'kota' => ['required', 'exists:wilayah,kota_id'],
             'kecamatan' => ['required', 'exists:wilayah,kecamatan_id'],  // Validasi kecamatan berdasarkan kota
             'desa' => ['required', 'exists:wilayah,desa_id'],  // Validasi desa berdasarkan kecamatan
-            'RT' => ['required', 'integer'],
-            'RW' => ['required', 'integer'],
+            'RT' => ['required', 'numeric'],
+            'RW' => ['required', 'numeric'],
         ]);
+        
         $wilayah = Wilayah::where('kota_id', $request->kota)
-        ->where('kecamatan_id', $request->kecamatan)
-        ->where('desa_id', $request->desa)
-        ->firstOrFail();
-;
+            ->where('kecamatan_id', $request->kecamatan)
+            ->where('desa_id', 'like', $request->desa . '%')
+            ->firstOrFail();
         
         // Simpan user
         $user = User::create([
@@ -72,10 +76,10 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        // Login user yang baru dibuat
-        Auth::login($user);
+        // Jangan login user secara otomatis
+        // Auth::login($user);
 
-        // Redirect ke halaman dashboard
-        return redirect(route('dashboard', absolute: false));
+        // Redirect ke halaman login dengan pesan sukses
+        return redirect()->route('login')->with('status', 'Registrasi berhasil! Silakan login dengan akun Anda.');
     }
 }

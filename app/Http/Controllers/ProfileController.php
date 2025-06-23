@@ -12,13 +12,41 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
+     * Display the user's profile.
+     */
+    public function show(Request $request): View
+    {
+        $user = $request->user();
+        
+        // Load relasi alamat jika ada
+        $user->load('alamat');
+        
+        return view('profile.show', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
      * Display the user's profile form.
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        
+        // Load relasi alamat jika ada
+        $user->load('alamat');
+        
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
         ]);
+    }
+
+    /**
+     * Display the user's password change form.
+     */
+    public function password(Request $request): View
+    {
+        return view('profile.password');
     }
 
     /**
@@ -26,15 +54,21 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        
+        // Update data user (kecuali role)
+        $userData = $request->validated();
+        unset($userData['role']); // Pastikan role tidak diupdate
+        
+        $user->fill($userData);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.show')->with('status', 'profile-updated');
     }
 
     /**
