@@ -22,69 +22,85 @@
                 class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 mx-auto text-gray-600">
 
                 <a href="{{ url('/') }}" class="hover:text-blue-600">Homepage</a>
-                
-                @auth
-                    @if(Auth::user()->role === 'staff')
-                        <a href="{{ route('staff.dashboard') }}" class="hover:text-blue-600">Dashboard</a>
-                    @else
-                        <a href="{{ route('dashboard') }}" class="hover:text-blue-600">Dashboard</a>
-                    @endif
-                @endauth
+                <a href="{{ route('dashboard') }}" class="hover:text-blue-600">Dashboard</a>
+
+                @if(Auth::check() && Auth::user()->role === 'staff')
+                <div class="relative" id="dropdown-wrapper">
+                        <button id="dropdown-toggle"
+                            class="flex items-center hover:text-blue-600 focus:outline-none focus:text-blue-600"
+                            aria-haspopup="true" aria-expanded="false">
+                            Layanan
+                            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="dropdown-menu"
+                            class="absolute left-0 mt-2 w-48 hidden bg-white shadow-lg rounded-md z-50">
+                            <a href="{{ route('pengaduan.index') }}"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan Pengaduan</a>
+                            <a href="{{ route('tracking.index') }}"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Track Pengaduan</a>
+                            <a href="{{ route('pendampingan.index') }}"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan Pendampingan</a>
+                            <a href="{{ route('konseling.index') }}"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan Konseling</a>
+                        </div>
+                    </div>
+                    <!-- Dropdown Kelola Data -->
+                    <div class="relative" id="kelola-data-dropdown">
+                        <button id="kelola-data-toggle"
+                            class="flex items-center hover:text-blue-600 focus:outline-none focus:text-blue-600"
+                            aria-haspopup="true" aria-expanded="false">
+                            Kelola Data
+                            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="kelola-data-menu" class="absolute left-0 mt-2 w-48 hidden bg-white shadow-lg rounded-md z-50">
+                            <a href="{{ route('staff.wilayah.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Wilayah</a>
+                            <a href="{{ route('staff.pekerjaan.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Pekerjaan</a>
+                            <a href="{{ route('staff.instruktur.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Instruktur</a>
+                            <a href="{{ route('staff.layanan.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan</a>
+                        </div>
+                    </div>
+                @endif
+
+                @if(Auth::check() && Auth::user()->role === 'super_admin')
+                    <a href="{{ route('admin.staff.index') }}" class="hover:text-blue-600">Manajemen Staff</a>
+                @endif
 
                 <!-- Dropdown -->
-                <div class="relative" id="dropdown-wrapper">
-                    <button id="dropdown-toggle"
-                        class="flex items-center hover:text-blue-600 focus:outline-none focus:text-blue-600"
-                        aria-haspopup="true" aria-expanded="false">
-                        Layanan
-                        <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <div id="dropdown-menu" class="absolute left-0 mt-2 w-48 hidden bg-white shadow-lg rounded-md z-50">
-                        <a href="{{ route('pengaduan.index') }}"
-                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan Pengaduan</a>
-                        <a href="{{ route('tracking.index') }}"
-                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Track Pengaduan</a>
-                        <a href="{{ route('pendampingan.index') }}"
-                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan Pendampingan</a>
-                        <a href="{{ route('konseling.index') }}"
-                            class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan Konseling</a>
+                @if (!in_array(Auth::user()?->role, ['staff', 'super_admin']))
+                    <div class="relative" id="dropdown-wrapper">
+                        <button id="dropdown-toggle"
+                            class="flex items-center hover:text-blue-600 focus:outline-none focus:text-blue-600"
+                            aria-haspopup="true" aria-expanded="false">
+                            Layanan
+                            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="dropdown-menu"
+                            class="absolute left-0 mt-2 w-48 hidden bg-white shadow-lg rounded-md z-50">
+                            <a href="{{ route('pengaduan.index') }}"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan Pengaduan</a>
+                            <a href="{{ route('tracking.index') }}"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Track Pengaduan</a>
+                            <a href="{{ route('pendampingan.index') }}"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan Pendampingan</a>
+                            <a href="{{ route('konseling.index') }}"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Layanan Konseling</a>
+                        </div>
                     </div>
-                </div>
+                @endif
 
                 @guest
                     <a href="#" class="hover:text-blue-600">Edukasi</a>
                     <a href="#" class="hover:text-blue-600">About</a>
                 @endguest
-                
-                @auth
-                    @if(Auth::user()->role === 'staff')
-                        <!-- Staff Menu -->
-                        <div class="relative" id="staff-dropdown-wrapper">
-                            <button id="staff-dropdown-toggle"
-                                class="flex items-center hover:text-blue-600 focus:outline-none focus:text-blue-600"
-                                aria-haspopup="true" aria-expanded="false">
-                                Kelola Data
-                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <div id="staff-dropdown-menu" class="absolute left-0 mt-2 w-48 hidden bg-white shadow-lg rounded-md z-50">
-                                <a href="{{ route('staff.wilayah.index') }}"
-                                    class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Kelola Wilayah</a>
-                                <a href="{{ route('staff.pekerjaan.index') }}"
-                                    class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Kelola Pekerjaan</a>
-                                <a href="{{ route('staff.instruktur.index') }}"
-                                    class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Kelola Instruktur</a>
-                                <a href="{{ route('staff.layanan.index') }}"
-                                    class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Kelola Layanan</a>
-                            </div>
-                        </div>
-                    @endif
-                @endauth
             </div>
             
             <div
@@ -126,57 +142,44 @@
             navMenu.classList.toggle('hidden');
         });
 
-        // Dropdown toggle
-        const dropdownToggle = document.getElementById('dropdown-toggle');
-        const dropdownMenu = document.getElementById('dropdown-menu');
-
-        dropdownToggle.addEventListener('click', (e) => {
-            e.stopPropagation(); // agar klik di button dropdown tidak memicu event klik di document
-            const isHidden = dropdownMenu.classList.contains('hidden');
-            if (isHidden) {
-                dropdownMenu.classList.remove('hidden');
-                dropdownToggle.setAttribute('aria-expanded', 'true');
-            } else {
-                dropdownMenu.classList.add('hidden');
-                dropdownToggle.setAttribute('aria-expanded', 'false');
-            }
-        });
-
-        // Staff dropdown toggle
-        const staffDropdownToggle = document.getElementById('staff-dropdown-toggle');
-        const staffDropdownMenu = document.getElementById('staff-dropdown-menu');
-
-        if (staffDropdownToggle) {
-            staffDropdownToggle.addEventListener('click', (e) => {
+        // Dropdown Layanan toggle
+        const layananToggle = document.getElementById('dropdown-toggle');
+        const layananMenu = document.getElementById('dropdown-menu');
+        if (layananToggle && layananMenu) {
+            layananToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const isHidden = staffDropdownMenu.classList.contains('hidden');
-                if (isHidden) {
-                    staffDropdownMenu.classList.remove('hidden');
-                    staffDropdownToggle.setAttribute('aria-expanded', 'true');
-                } else {
-                    staffDropdownMenu.classList.add('hidden');
-                    staffDropdownToggle.setAttribute('aria-expanded', 'false');
-                }
+                layananMenu.classList.toggle('hidden');
+                layananToggle.setAttribute('aria-expanded', !layananMenu.classList.contains('hidden'));
             });
         }
 
-        // Hide dropdown when click outside
+        // Dropdown Kelola Data toggle
+        const kelolaDataToggle = document.getElementById('kelola-data-toggle');
+        const kelolaDataMenu = document.getElementById('kelola-data-menu');
+        if (kelolaDataToggle && kelolaDataMenu) {
+            kelolaDataToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                kelolaDataMenu.classList.toggle('hidden');
+                kelolaDataToggle.setAttribute('aria-expanded', !kelolaDataMenu.classList.contains('hidden'));
+            });
+        }
+
+        // Hide dropdowns when click outside
         document.addEventListener('click', (e) => {
-            if (!dropdownMenu.classList.contains('hidden')) {
-                // Jika klik di luar dropdown-wrapper, sembunyikan dropdown
-                const dropdownWrapper = document.getElementById('dropdown-wrapper');
-                if (!dropdownWrapper.contains(e.target)) {
-                    dropdownMenu.classList.add('hidden');
-                    dropdownToggle.setAttribute('aria-expanded', 'false');
+            // Layanan
+            if (layananMenu && !layananMenu.classList.contains('hidden')) {
+                const layananWrapper = document.getElementById('dropdown-wrapper');
+                if (!layananWrapper.contains(e.target)) {
+                    layananMenu.classList.add('hidden');
+                    layananToggle.setAttribute('aria-expanded', 'false');
                 }
             }
-
-            if (staffDropdownMenu && !staffDropdownMenu.classList.contains('hidden')) {
-                // Jika klik di luar staff-dropdown-wrapper, sembunyikan dropdown
-                const staffDropdownWrapper = document.getElementById('staff-dropdown-wrapper');
-                if (!staffDropdownWrapper.contains(e.target)) {
-                    staffDropdownMenu.classList.add('hidden');
-                    staffDropdownToggle.setAttribute('aria-expanded', 'false');
+            // Kelola Data
+            if (kelolaDataMenu && !kelolaDataMenu.classList.contains('hidden')) {
+                const kelolaDataWrapper = document.getElementById('kelola-data-dropdown');
+                if (!kelolaDataWrapper.contains(e.target)) {
+                    kelolaDataMenu.classList.add('hidden');
+                    kelolaDataToggle.setAttribute('aria-expanded', 'false');
                 }
             }
         });

@@ -71,6 +71,9 @@ class DataDashboardController extends Controller
             })
             ->filter(); // Hapus nilai null jika ada pengaduan tanpa korban
 
+        // Pastikan $allKorban adalah Collection
+        $allKorban = collect($allKorban);
+
         $statistikKorban = $allKorban->groupBy('jenis_kelamin')
             ->map(function ($group) {
                 return [

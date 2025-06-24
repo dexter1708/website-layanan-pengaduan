@@ -54,7 +54,7 @@
                         <div class="mb-4">
                             <label for="nama_kota" class="block text-sm font-medium text-gray-700 mb-2">Nama Kota</label>
                             <input type="text" name="nama" id="nama_kota" value="{{ old('nama') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Masukkan nama kota">
-                            @error('nama')
+                            @error('kota_nama')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -96,7 +96,7 @@
                         <div class="mb-4">
                             <label for="nama_kecamatan" class="block text-sm font-medium text-gray-700 mb-2">Nama Kecamatan</label>
                             <input type="text" name="nama" id="nama_kecamatan" value="{{ old('nama') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Masukkan nama kecamatan">
-                            @error('nama')
+                            @error('kecamatan_nama')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -139,7 +139,7 @@
                         <div class="mb-4">
                             <label for="nama_desa" class="block text-sm font-medium text-gray-700 mb-2">Nama Desa</label>
                             <input type="text" name="nama" id="nama_desa" value="{{ old('nama') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Masukkan nama desa">
-                            @error('nama')
+                            @error('desa_nama')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>

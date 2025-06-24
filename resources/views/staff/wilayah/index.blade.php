@@ -151,7 +151,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
                                         <a href="{{ route('staff.wilayah.edit', ['type' => 'desa', 'id' => $item->desa_id]) }}" class="text-yellow-600 hover:text-yellow-900">Edit</a>
-                                        <form action="{{ route('staff.wilayah.destroy', ['type' => 'desa', 'id' => $item->desa_id]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus desa ini?');">
+                                        <form action="{{ route('staff.wilayah.destroy', ['type' => 'desa', 'id' => $item->id]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus desa ini?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>

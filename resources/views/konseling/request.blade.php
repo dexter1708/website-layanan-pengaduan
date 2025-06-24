@@ -98,14 +98,19 @@
                         <!-- Tanggal Konseling -->
                         <div>
                             <label for="tanggal_konseling" class="form-label">Tanggal Konseling *</label>
-                            <input type="text" id="tanggal_konseling" name="tanggal_konseling" value="{{ old('tanggal_konseling') }}" placeholder="Pilih Tanggal" required class="form-input" />
+                            <input type="date" id="tanggal_konseling" name="tanggal_konseling" value="{{ old('tanggal_konseling') }}" placeholder="Pilih Tanggal" required class="form-input" />
                         </div>
 
                         <!-- Waktu Konseling -->
                         <div>
                             <label for="waktu_konseling" class="form-label">Waktu Konseling *</label>
-                            <input type="text" id="waktu_konseling" name="waktu_konseling" value="{{ old('waktu_konseling') }}" placeholder="Pilih Waktu" required class="form-input" />
-                             <p class="mt-1 text-sm text-gray-500">Format waktu: 24 Jam (Contoh: 14:30)</p>
+                            <select id="waktu_konseling" name="waktu_konseling" required class="form-input">
+                                <option value="" selected disabled>-- Pilih Waktu --</option>
+                                @for ($i = 8; $i <= 15; $i++)
+                                    @php $time = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00'; @endphp
+                                    <option value="{{ $time }}" {{ old('waktu_konseling') == $time ? 'selected' : '' }}>{{ $time }} WIB</option>
+                                @endfor
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -126,12 +131,10 @@
      data-pengaduan="{{ json_encode($pengaduans->map(function($pengaduan) {
          return [
              'id' => $pengaduan->id,
-             'korban' => $pengaduan->korban ? $pengaduan->korban->map(function($korban) {
-                 return [
-                     'id' => $korban->id,
-                     'nama' => $korban->nama ?? 'Nama tidak tersedia'
-                 ];
-             }) : []
+             'korban' => $pengaduan->korban ? [[
+                 'id' => $pengaduan->korban->id,
+                 'nama' => $pengaduan->korban->nama ?? 'Nama tidak tersedia'
+             ]] : []
          ];
      })) }}"
      style="display: none;">
@@ -139,20 +142,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    flatpickr("#tanggal_konseling", {
-        dateFormat: "Y-m-d",
-        altInput: true,
-        altFormat: "d-m-Y",
-        minDate: "today"
-    });
-
-    flatpickr("#waktu_konseling", {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        time_24hr: true
-    });
-
     const pengaduanSelect = document.getElementById('pengaduan_id');
     const korbanSelect = document.getElementById('korban_id');
     const noKorbanMessage = document.getElementById('no-korban-message');

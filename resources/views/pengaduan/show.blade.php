@@ -19,11 +19,6 @@
             <div class="p-6 border-b border-gray-200 flex justify-between items-center">
                 <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-4 py-2 rounded-lg">
                     Laporan Pengaduan #{{ $pengaduan->id }}
-                </span>
-                <a href="{{ route('pengaduan.index') }}" 
-                   class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm">
-                    Kembali 
-                </a>
             </div>
 
             <!-- Detail Content -->

@@ -27,7 +27,7 @@ class WilayahController extends Controller
                              ->get();
 
         // Ambil daftar desa
-        $desas = Wilayah::select('desa_id', 'desa_nama', 'kecamatan_id', 'kecamatan_nama', 'kota_id', 'kota_nama')
+        $desas = Wilayah::select('id', 'desa_id', 'desa_nama', 'kecamatan_id', 'kecamatan_nama', 'kota_id', 'kota_nama')
                         ->whereNotNull('desa_nama')
                         ->orderBy('kota_nama')
                         ->orderBy('kecamatan_nama')
@@ -291,39 +291,15 @@ class WilayahController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy($type, $id)
     {
-        // Gunakan helper function untuk mencari wilayah
-        $result = $this->findWilayahById($id);
-        $wilayah = $result['wilayah'];
-        $tipe = $result['tipe'];
-
+        $wilayah = Wilayah::find($id);
         if (!$wilayah) {
             return redirect()->route('staff.wilayah.index')
                 ->with('error', 'Wilayah tidak ditemukan');
         }
-
         try {
-            switch ($tipe) {
-                case 'kota':
-                    // Hapus semua data yang terkait dengan kota ini
-                    Wilayah::where('kota_id', $id)->delete();
-                    break;
-                case 'kecamatan':
-                    // Hapus semua data yang terkait dengan kecamatan ini
-                    Wilayah::where('kota_id', $wilayah->kota_id)
-                          ->where('kecamatan_id', $id)
-                          ->delete();
-                    break;
-                case 'desa':
-                    // Hapus hanya desa ini
-                    Wilayah::where('kota_id', $wilayah->kota_id)
-                          ->where('kecamatan_id', $wilayah->kecamatan_id)
-                          ->where('desa_id', $id)
-                          ->delete();
-                    break;
-            }
-
+            $wilayah->delete();
             return redirect()->route('staff.wilayah.index')
                 ->with('success', 'Wilayah berhasil dihapus');
         } catch (\Exception $e) {
@@ -362,6 +338,18 @@ class WilayahController extends Controller
      */
     private function findWilayahById($id)
     {
-        return Wilayah::find($id);
+        $wilayah = Wilayah::find($id);
+        if (!$wilayah) return ['wilayah' => null, 'tipe' => null];
+        // Tentukan tipe berdasarkan field yang terisi
+        if (!empty($wilayah->desa_nama)) {
+            $tipe = 'desa';
+        } elseif (!empty($wilayah->kecamatan_nama)) {
+            $tipe = 'kecamatan';
+        } elseif (!empty($wilayah->kota_nama)) {
+            $tipe = 'kota';
+        } else {
+            $tipe = null;
+        }
+        return ['wilayah' => $wilayah, 'tipe' => $tipe];
     }
 }

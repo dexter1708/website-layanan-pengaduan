@@ -72,7 +72,7 @@ class Pendampingan extends Model
     {
         return match ($this->konfirmasi) {
             self::STATUS_BUTUH_KONFIRMASI_STAFF => 'Menunggu Konfirmasi Staff',
-            self::STATUS_MENUNGGU_KONFIRMASI_USER => 'Menunggu Konfirmasi Anda',
+            self::STATUS_MENUNGGU_KONFIRMASI_USER => 'Menunggu Konfirmasi Pelapor',
             self::STATUS_TERKONFIRMASI => 'Terkonfirmasi',
             self::STATUS_DIBATALKAN => 'Dibatalkan',
             default => 'Tidak Diketahui',

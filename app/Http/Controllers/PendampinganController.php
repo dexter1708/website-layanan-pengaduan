@@ -144,10 +144,13 @@ class PendampinganController extends Controller
 
     public function showkonfirmasi($id)
     {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
         $pendampingan = Pendampingan::with(['pengaduan', 'korban'])->findOrFail($id);
 
         // Pastikan hanya user yang berwenang yang bisa mengakses
-        $user = Auth::user();
         if ($user->role !== 'staff' && $pendampingan->pengaduan->user_id !== $user->id) {
             abort(403, 'Anda tidak memiliki izin untuk mengakses halaman ini.');
         }
@@ -247,6 +250,9 @@ class PendampinganController extends Controller
     public function updateKonfirmasi(Request $request, $id)
     {
         $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
         $pendampingan = Pendampingan::findOrFail($id);
 
         // Hanya user terkait yang bisa update, atau staff
@@ -255,13 +261,13 @@ class PendampinganController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => ['required', Rule::in([
+            'konfirmasi' => ['required', Rule::in([
                 Pendampingan::STATUS_TERKONFIRMASI,
                 Pendampingan::STATUS_DIBATALKAN,
             ])],
         ]);
 
-        $pendampingan->update(['konfirmasi' => $validated['status']]);
+        $pendampingan->update(['konfirmasi' => $validated['konfirmasi']]);
 
         return redirect()->back()->with('success', 'Status konfirmasi berhasil diperbarui.');
     }
@@ -296,7 +302,7 @@ class PendampinganController extends Controller
             'jenis_layanan' => 'required|exists:layanan,nama_layanan',
             'tanggal_pendampingan' => 'required|date|after_or_equal:today',
             'waktu_pendampingan' => 'required|date_format:H:i',
-            'catatan' => 'nullable|string',
+            
         ]);
         
         // Gabungkan tanggal dan waktu
@@ -307,7 +313,6 @@ class PendampinganController extends Controller
             'korban_id' => $validatedData['korban_id'],
             'jenis_layanan' => $validatedData['jenis_layanan'],
             'tanggal_pendampingan' => $jadwal,
-            'catatan' => $validatedData['catatan'],
             'konfirmasi' => Pendampingan::STATUS_BUTUH_KONFIRMASI_STAFF, // Default status
         ]);
 

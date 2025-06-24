@@ -96,6 +96,7 @@
             <thead class="bg-blue-600 text-white text-center text-xs sm:text-sm">
                 <tr>
                     <th class="p-3">ID Pengaduan</th>
+                    <th class="p-3">Nama Korban</th>
                     <th class="p-3">Nama Pendamping</th>
                     <th class="p-3">Tanggal</th>
                     <th class="p-3">Waktu</th>
@@ -103,12 +104,13 @@
                     <th class="p-3">Jenis Layanan</th>
                     <th class="p-3">Status</th>
                     <th class="p-3">Aksi</th>
-                                </tr>
-                            </thead>
+                </tr>
+            </thead>
             <tbody class="divide-y divide-gray-200 text-center">
                 @forelse($pendampingans as $p)
                     <tr>
                         <td class="p-3">{{ $p->pengaduan_id }}</td>
+                        <td class="p-3">{{ $p->korban->nama ?? '-' }}</td>
                         <td class="p-3">{{ $p->nama_pendamping ?? 'Belum Ditentukan' }}</td>
                         <td class="p-3">{{ $p->tanggal_pendampingan ? \Carbon\Carbon::parse($p->tanggal_pendampingan)->format('d-m-Y') : '-' }}</td>
                         <td class="p-3">{{ $p->tanggal_pendampingan ? \Carbon\Carbon::parse($p->tanggal_pendampingan)->format('H:i') : '-' }}</td>
@@ -117,38 +119,19 @@
                         <td class="p-3">
                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $p->status_badge_class }} text-white">
                                 {{ $p->status_label }}
-                                            </span>
-                                        </td>
+                            </span>
+                        </td>
                         <td class="p-3">
-                            @if ($p->konfirmasi == \App\Models\Pendampingan::STATUS_MENUNGGU_KONFIRMASI_USER)
-                                <div class="flex items-center justify-center gap-2">
-                                    <form action="{{ route('pendampingan.konfirmasi.update', $p->id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input type="hidden" name="konfirmasi" value="terkonfirmasi">
-                                        <button type="submit" class="text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200 p-2 rounded-full" title="Setuju">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('pendampingan.konfirmasi.update', $p->id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input type="hidden" name="konfirmasi" value="dibatalkan">
-                                        <button type="submit" class="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-2 rounded-full" title="Tolak">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            @else
+                            <div class="flex items-center justify-center gap-2">
                                 <a href="{{ route('pendampingan.show', $p->id) }}" class="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-2 rounded-full inline-flex items-center justify-center" title="Lihat Detail">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                 </a>
-                            @endif
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="p-4 text-center text-gray-500">
+                        <td colspan="9" class="p-4 text-center text-gray-500">
                             Tidak ada jadwal pendampingan yang diajukan.
                         </td>
                     </tr>

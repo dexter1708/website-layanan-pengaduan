@@ -78,8 +78,22 @@
             </div>
 
         </div>
+        @if($pendampingan->konfirmasi == \App\Models\Pendampingan::STATUS_MENUNGGU_KONFIRMASI_USER)
+        <div class="bg-gray-50 px-6 py-6 mt-8 rounded-lg border-t border-gray-200">
+            <form method="POST" action="{{ route('pendampingan.konfirmasi.update', $pendampingan->id) }}" class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                @csrf
+                @method('PATCH')
+                <button type="submit" name="konfirmasi" value="terkonfirmasi" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300">
+                    Setuju
+                </button>
+                <button type="submit" name="konfirmasi" value="dibatalkan" class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300">
+                    Tolak
+                </button>
+            </form>
+        </div>
+        @endif
         <div class="mt-6 flex justify-end">
-            <a href="{{ url()->previous() }}" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400">Kembali</a>
+            <a href="{{ route('pendampingan.index') }}" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400">Kembali</a>
         </div>
     </div>
 </section>

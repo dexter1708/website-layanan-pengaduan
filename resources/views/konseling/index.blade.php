@@ -76,6 +76,7 @@
             <thead class="bg-blue-600 text-white text-center text-xs sm:text-sm">
                 <tr>
                     <th class="p-3">ID Pengaduan</th>
+                    <th class="p-3">Nama Korban</th>
                     <th class="p-3">Nama Konselor</th>
                     <th class="p-3">Tanggal</th>
                     <th class="p-3">Waktu</th>
@@ -89,6 +90,7 @@
                 @forelse($konselings as $k)
                     <tr>
                         <td class="p-3">{{ $k->pengaduan_id }}</td>
+                        <td class="p-3">{{ $k->korban->nama ?? '-' }}</td>
                         <td class="p-3">{{ $k->nama_konselor ?? 'Belum Ditentukan' }}</td>
                         <td class="p-3">{{ $k->jadwal_konseling ? \Carbon\Carbon::parse($k->jadwal_konseling)->format('d-m-Y') : '-' }}</td>
                         <td class="p-3">{{ $k->jadwal_konseling ? \Carbon\Carbon::parse($k->jadwal_konseling)->format('H:i') : '-' }}</td>
@@ -107,7 +109,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="p-4 text-center text-gray-500">
+                        <td colspan="9" class="p-4 text-center text-gray-500">
                             Tidak ada jadwal konseling yang diajukan.
                         </td>
                     </tr>
