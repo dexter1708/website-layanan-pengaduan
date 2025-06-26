@@ -9,6 +9,7 @@ use App\Models\layanan;
 use App\Models\instruktur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
@@ -135,7 +136,7 @@ class KonselingController extends Controller
         $user = Auth::user();
         
         // Ambil semua pengaduan user yang memiliki korban
-        $pengaduans = Pengaduan::with('korban')
+        $pengaduans = Pengaduan::with(['korban', 'pelapor'])
             ->where('user_id', $user->id)
             ->whereHas('korban')
             ->get();
@@ -145,20 +146,22 @@ class KonselingController extends Controller
             return !$pengaduan->korban->konseling;
         });
             
-        // Siapkan data korban untuk JavaScript
-        $korbanData = $pengaduans->mapWithKeys(function($p) {
-            if ($p->korban) {
-                return [$p->id => [
-                    'id' => $p->korban->id,
-                    'nama' => $p->korban->nama,
-                    'has_konseling' => false // Karena sudah difilter di query
-                ]];
-            }
-            return [$p->id => null];
-        });
+        // Debug: Log data pengaduan untuk memeriksa struktur korban
+        \Log::info('Pengaduan data for konseling form:', $pengaduans->map(function($pengaduan) {
+            return [
+                'id' => $pengaduan->id,
+                'korban' => $pengaduan->korban ? [
+                    'id' => $pengaduan->korban->id,
+                    'nama' => $pengaduan->korban->nama
+                ] : null,
+                'pelapor' => $pengaduan->pelapor ? [
+                    'nama_pelapor' => $pengaduan->pelapor->nama_pelapor
+                ] : null
+            ];
+        })->toArray());
             
         $layanans = layanan::where('jenis_layanan', 'konseling')->get();
-        return view('konseling.request', compact('pengaduans', 'layanans', 'korbanData'));
+        return view('konseling.request', compact('pengaduans', 'layanans'));
     }
 
     public function requestCounseling(Request $request)
