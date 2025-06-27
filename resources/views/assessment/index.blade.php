@@ -65,11 +65,24 @@
                                             <a href="{{ route('assessment.show', $assessment->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Detail</a>
                                             @if(auth()->user() && auth()->user()->role === 'staff')
                                                 <a href="{{ route('staff.assessment.edit', $assessment->id) }}" class="text-yellow-600 hover:text-yellow-900 mr-3">Edit</a>
-                                                <form action="{{ route('staff.assessment.destroy', $assessment->id) }}" method="POST" class="inline">
+                                                <button type="button" 
+                                                        class="text-red-600 hover:text-red-900" 
+                                                        onclick="showDeleteModal('delete-form-{{ $assessment->id }}', 'delete-modal-{{ $assessment->id }}')">
+                                                    Hapus
+                                                </button>
+                                                
+                                                <!-- Hidden form for deletion -->
+                                                <form id="delete-form-{{ $assessment->id }}" action="{{ route('staff.assessment.destroy', $assessment->id) }}" method="POST" class="hidden">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Apakah Anda yakin ingin menghapus jadwal assessment ini?')">Hapus</button>
                                                 </form>
+                                                
+                                                <!-- Delete confirmation modal -->
+                                                <x-delete-confirmation-modal 
+                                                    id="delete-modal-{{ $assessment->id }}"
+                                                    title="Konfirmasi Hapus Assessment"
+                                                    message="Apakah Anda yakin ingin menghapus data ini?"
+                                                />
                                             @endif
                                         </td>
                                     </tr>

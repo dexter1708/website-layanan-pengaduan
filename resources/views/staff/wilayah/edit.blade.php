@@ -36,7 +36,7 @@
                 </div>
 
                 @if($tipe && in_array($tipe, ['kota', 'kecamatan', 'desa']))
-                <form action="{{ route('staff.wilayah.update', $id) }}" method="POST">
+                <form action="{{ route('staff.wilayah.update', ['type' => $tipe, 'id' => $id]) }}" method="POST">
                     @csrf
                     @method('PUT')
 

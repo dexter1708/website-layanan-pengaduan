@@ -23,6 +23,48 @@
 
             <!-- Detail Content -->
             <div class="p-8">
+                <!-- Data Pelapor -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Data Pelapor</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <!-- Kolom Kiri Pelapor -->
+                        <div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">Nama Pelapor</label>
+                                <p class="text-gray-800">{{ $pengaduan->pelapor->nama_pelapor ?? $pengaduan->user->name ?? '-' }}</p>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">Kota</label>
+                                <p class="text-gray-800">{{ $pengaduan->user->alamat->kota ?? '-' }}</p>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">Kecamatan</label>
+                                <p class="text-gray-800">{{ $pengaduan->user->alamat->kecamatan ?? '-' }}</p>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">RT/RW</label>
+                                <p class="text-gray-800">{{ ($pengaduan->user->alamat->RT ?? '-') . '/' . ($pengaduan->user->alamat->RW ?? '-') }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Kolom Kanan Pelapor -->
+                        <div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">Email</label>
+                                <p class="text-gray-800">{{ $pengaduan->user->email ?? '-' }}</p>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">No Telepon</label>
+                                <p class="text-gray-800">{{ $pengaduan->user->no_telepon ?? '-' }}</p>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">Kelurahan</label>
+                                <p class="text-gray-800">{{ $pengaduan->user->alamat->desa ?? '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Identitas Korban & Detail Kasus</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">

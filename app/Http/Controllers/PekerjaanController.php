@@ -22,6 +22,11 @@ class PekerjaanController extends Controller
     {
         $request->validate([
             'pekerjaan' => 'required|string|max:255|unique:pekerjaan',
+        ], [
+            'pekerjaan.required' => 'Nama pekerjaan wajib diisi.',
+            'pekerjaan.string' => 'Nama pekerjaan harus berupa teks.',
+            'pekerjaan.max' => 'Nama pekerjaan tidak boleh lebih dari 255 karakter.',
+            'pekerjaan.unique' => 'Nama pekerjaan sudah ada.',
         ]);
 
         Pekerjaan::create($request->all());
@@ -39,6 +44,11 @@ class PekerjaanController extends Controller
     {
         $request->validate([
             'pekerjaan' => 'required|string|max:255|unique:pekerjaan,pekerjaan,' . $pekerjaan->id,
+        ], [
+            'pekerjaan.required' => 'Nama pekerjaan wajib diisi.',
+            'pekerjaan.string' => 'Nama pekerjaan harus berupa teks.',
+            'pekerjaan.max' => 'Nama pekerjaan tidak boleh lebih dari 255 karakter.',
+            'pekerjaan.unique' => 'Nama pekerjaan sudah ada.',
         ]);
 
         $pekerjaan->update($request->all());

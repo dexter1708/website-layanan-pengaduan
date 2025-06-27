@@ -14,24 +14,6 @@
                     <li class="text-gray-500">Detail Jadwal #{{ $konseling->id }}</li>
                 </ol>
             </nav>
-            <div class="mt-3 sm:mt-0">
-                @if ($konseling->konfirmasi === \App\Models\Konseling::STATUS_MENUNGGU_KONFIRMASI_USER && auth()->user()->role !== 'staff')
-                    <div class="flex items-center justify-center gap-2">
-                        <form action="{{ route('konseling.update-konfirmasi', $konseling->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="konfirmasi" value="terkonfirmasi">
-                            <button type="submit" class="bg-green-500 text-white text-sm font-medium py-2 px-4 rounded hover:bg-green-600 transition">Setuju</button>
-                        </form>
-                        <form action="{{ route('konseling.update-konfirmasi', $konseling->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="konfirmasi" value="dibatalkan">
-                            <button type="submit" class="bg-red-500 text-white text-sm font-medium py-2 px-4 rounded hover:bg-red-600 transition">Tolak</button>
-                        </form>
-                    </div>
-                @endif
-            </div>
         </div>
 
         @if(session('success'))
@@ -95,6 +77,30 @@
                 </dl>
             </div>
 
+            <!-- Tombol Konfirmasi - Dipindahkan ke bawah detail informasi -->
+            @if ($konseling->konfirmasi === \App\Models\Konseling::STATUS_MENUNGGU_KONFIRMASI_USER && auth()->user()->role !== 'staff')
+                <div class="border-t border-gray-200 mt-6 pt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Jadwal</h3>
+                    <div class="flex items-center justify-center gap-4">
+                        <form action="{{ route('konseling.update-konfirmasi', $konseling->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="konfirmasi" value="terkonfirmasi">
+                            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300">
+                                Setuju
+                            </button>
+                        </form>
+                        <form action="{{ route('konseling.update-konfirmasi', $konseling->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="konfirmasi" value="dibatalkan">
+                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300">
+                                Tolak
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endif
         </div>
         <div class="mt-6 flex justify-end">
             <a href="{{ url()->previous() }}" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400">Kembali</a>

@@ -35,11 +35,24 @@
                                             <div class="flex space-x-2">
                                                 <a href="{{ route('users.show', $user->id) }}" class="text-blue-600 hover:text-blue-900">Detail</a>
                                                 <a href="{{ route('users.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pelapor ini?');">
+                                                <button type="button" 
+                                                        class="text-red-600 hover:text-red-900" 
+                                                        onclick="showDeleteModal('delete-form-{{ $user->id }}', 'delete-modal-{{ $user->id }}')">
+                                                    Hapus
+                                                </button>
+                                                
+                                                <!-- Hidden form for deletion -->
+                                                <form id="delete-form-{{ $user->id }}" action="{{ route('users.destroy', $user->id) }}" method="POST" class="hidden">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
                                                 </form>
+                                                
+                                                <!-- Delete confirmation modal -->
+                                                <x-delete-confirmation-modal 
+                                                    id="delete-modal-{{ $user->id }}"
+                                                    title="Konfirmasi Hapus Pelapor"
+                                                    message="Apakah Anda yakin ingin menghapus data ini?"
+                                                />
                                             </div>
                                         </td>
                                     </tr>

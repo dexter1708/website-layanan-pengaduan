@@ -55,6 +55,8 @@
     <title>Login</title>
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 
 <body class="min-h-screen flex items-center justify-center bg-cover bg-center"
@@ -89,8 +91,13 @@
             <!-- Password -->
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">Password</label>
-                <input name="password" type="password" placeholder="Password" required
-                    class="w-full mt-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                <div class="relative">
+                    <input id="password" name="password" type="password" placeholder="Password" required
+                        class="w-full mt-1 px-3 py-2 pr-10 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <i id="eyeIcon" class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                    </button>
+                </div>
                 @error('password')
                     <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                 @enderror
@@ -118,6 +125,30 @@
                     class="text-sm text-blue-500 hover:underline">disini</a></span>
         </div>
     </div>
+
+    <!-- Script untuk toggle password -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const password = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            togglePassword.addEventListener('click', function() {
+                // Toggle password visibility
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                
+                // Toggle icon
+                if (type === 'text') {
+                    eyeIcon.classList.remove('fa-eye');
+                    eyeIcon.classList.add('fa-eye-slash');
+                } else {
+                    eyeIcon.classList.remove('fa-eye-slash');
+                    eyeIcon.classList.add('fa-eye');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

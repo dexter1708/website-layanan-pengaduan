@@ -6,13 +6,8 @@
             <p class="text-gray-600 text-lg mb-12">Lembaga yang bekerjasama dengan SAPA</p>
 
             <div class="relative">
-                <!-- Tombol geser kiri -->
-                <button id="scroll-left"
-                    class="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white shadow-md hover:bg-gray-100">
-                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
+                <!-- Tombol geser kiri (dihapus) -->
+                <!-- <button id="scroll-left" ...>...</button> -->
 
                 <!-- Kontainer scroll logo -->
                 <div id="scroll-container"
@@ -25,13 +20,8 @@
                     @endforeach
                 </div>
 
-                <!-- Tombol geser kanan -->
-                <button id="scroll-right"
-                    class="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white shadow-md hover:bg-gray-100">
-                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
+                <!-- Tombol geser kanan (dihapus) -->
+                <!-- <button id="scroll-right" ...>...</button> -->
             </div>
         </div>
 

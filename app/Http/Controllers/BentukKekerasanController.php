@@ -22,6 +22,11 @@ class BentukKekerasanController extends Controller
     {
         $request->validate([
             'bentuk_kekerasan' => 'required|string|max:255|unique:bentuk_kekerasan',
+        ], [
+            'bentuk_kekerasan.required' => 'Nama bentuk kekerasan wajib diisi.',
+            'bentuk_kekerasan.string' => 'Nama bentuk kekerasan harus berupa teks.',
+            'bentuk_kekerasan.max' => 'Nama bentuk kekerasan tidak boleh lebih dari 255 karakter.',
+            'bentuk_kekerasan.unique' => 'Nama bentuk kekerasan sudah ada.',
         ]);
 
         BentukKekerasan::create($request->all());
@@ -39,6 +44,11 @@ class BentukKekerasanController extends Controller
     {
         $request->validate([
             'bentuk_kekerasan' => 'required|string|max:255|unique:bentuk_kekerasan,bentuk_kekerasan,' . $bentukKekerasan->id,
+        ], [
+            'bentuk_kekerasan.required' => 'Nama bentuk kekerasan wajib diisi.',
+            'bentuk_kekerasan.string' => 'Nama bentuk kekerasan harus berupa teks.',
+            'bentuk_kekerasan.max' => 'Nama bentuk kekerasan tidak boleh lebih dari 255 karakter.',
+            'bentuk_kekerasan.unique' => 'Nama bentuk kekerasan sudah ada.',
         ]);
 
         $bentukKekerasan->update($request->all());

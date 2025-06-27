@@ -45,15 +45,11 @@ class InstrukturController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255|unique:instruktur,nama',
             'posisi' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nama_layanan' => 'required|exists:layanan,nama_layanan',
         ], [
             'nama.required' => 'Nama instruktur harus diisi',
             'nama.unique' => 'Nama instruktur sudah ada',
             'posisi.required' => 'Posisi harus diisi',
-            'foto.image' => 'File harus berupa gambar',
-            'foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif',
-            'foto.max' => 'Ukuran gambar maksimal 2MB',
             'nama_layanan.required' => 'Layanan harus dipilih',
             'nama_layanan.exists' => 'Layanan yang dipilih tidak valid',
         ]);
@@ -63,13 +59,6 @@ class InstrukturController extends Controller
             'posisi' => $request->posisi,
             'nama_layanan' => $request->nama_layanan,
         ];
-
-        if ($request->hasFile('foto')) {
-            $foto = $request->file('foto');
-            $fotoName = time() . '_' . $foto->getClientOriginalName();
-            $foto->storeAs('public/instruktur', $fotoName);
-            $data['foto'] = $fotoName;
-        }
 
         instruktur::create($data);
 
@@ -118,15 +107,11 @@ class InstrukturController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255|unique:instruktur,nama,' . $id,
             'posisi' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nama_layanan' => 'required|exists:layanan,nama_layanan',
         ], [
             'nama.required' => 'Nama instruktur harus diisi',
             'nama.unique' => 'Nama instruktur sudah ada',
             'posisi.required' => 'Posisi harus diisi',
-            'foto.image' => 'File harus berupa gambar',
-            'foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif',
-            'foto.max' => 'Ukuran gambar maksimal 2MB',
             'nama_layanan.required' => 'Layanan harus dipilih',
             'nama_layanan.exists' => 'Layanan yang dipilih tidak valid',
         ]);
@@ -136,18 +121,6 @@ class InstrukturController extends Controller
             'posisi' => $request->posisi,
             'nama_layanan' => $request->nama_layanan,
         ];
-
-        if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
-            if ($instruktur->foto) {
-                Storage::delete('public/instruktur/' . $instruktur->foto);
-            }
-
-            $foto = $request->file('foto');
-            $fotoName = time() . '_' . $foto->getClientOriginalName();
-            $foto->storeAs('public/instruktur', $fotoName);
-            $data['foto'] = $fotoName;
-        }
 
         $instruktur->update($data);
 

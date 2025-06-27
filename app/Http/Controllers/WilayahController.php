@@ -57,13 +57,19 @@ class WilayahController extends Controller
         $validated = $request->validate([
             'tipe' => 'required|in:kota,kecamatan,desa',
             'nama' => 'required|string|max:255',
+        ], [
+            'tipe.required' => 'Tipe wilayah wajib dipilih.',
+            'tipe.in' => 'Tipe wilayah harus berupa kota, kecamatan, atau desa.',
+            'nama.required' => 'Nama wilayah wajib diisi.',
+            'nama.string' => 'Nama wilayah harus berupa teks.',
+            'nama.max' => 'Nama wilayah tidak boleh lebih dari 255 karakter.',
         ]);
 
         switch ($request->tipe) {
             case 'kota':
                 // Check if kota already exists
                 $existingKota = Wilayah::where('kota_nama', $request->nama)
-                                      ->whereNotNull('kota_nama') // Check if it's a valid city entry
+                                      ->whereNotNull('kota_nama')
                                       ->first();
                 
                 if ($existingKota) {
@@ -76,6 +82,13 @@ class WilayahController extends Controller
                 $request->validate([
                     'kecamatan_nama' => 'required|string|max:255',
                     'desa_nama' => 'required|string|max:255',
+                ], [
+                    'kecamatan_nama.required' => 'Nama kecamatan wajib diisi.',
+                    'kecamatan_nama.string' => 'Nama kecamatan harus berupa teks.',
+                    'kecamatan_nama.max' => 'Nama kecamatan tidak boleh lebih dari 255 karakter.',
+                    'desa_nama.required' => 'Nama desa wajib diisi.',
+                    'desa_nama.string' => 'Nama desa harus berupa teks.',
+                    'desa_nama.max' => 'Nama desa tidak boleh lebih dari 255 karakter.',
                 ]);
 
                 // Get next available global IDs
@@ -98,6 +111,12 @@ class WilayahController extends Controller
                 $request->validate([
                     'kota_id' => 'required|integer',
                     'desa_nama' => 'required|string|max:255',
+                ], [
+                    'kota_id.required' => 'Kota wajib dipilih.',
+                    'kota_id.integer' => 'ID kota harus berupa angka.',
+                    'desa_nama.required' => 'Nama desa wajib diisi.',
+                    'desa_nama.string' => 'Nama desa harus berupa teks.',
+                    'desa_nama.max' => 'Nama desa tidak boleh lebih dari 255 karakter.',
                 ]);
                 
                 // Check if kota exists
@@ -143,6 +162,11 @@ class WilayahController extends Controller
                 $request->validate([
                     'kota_id' => 'required|integer',
                     'kecamatan_id' => 'required|integer',
+                ], [
+                    'kota_id.required' => 'Kota wajib dipilih.',
+                    'kota_id.integer' => 'ID kota harus berupa angka.',
+                    'kecamatan_id.required' => 'Kecamatan wajib dipilih.',
+                    'kecamatan_id.integer' => 'ID kecamatan harus berupa angka.',
                 ]);
 
                 // Check if kota exists
@@ -243,7 +267,10 @@ class WilayahController extends Controller
                                 ->get();
         }
 
-        return view('staff.wilayah.edit', compact('wilayah', 'type', 'kotas', 'kecamatans', 'id'));
+        // Menggunakan $tipe alih-alih $type untuk konsistensi dengan view
+        $tipe = $type;
+
+        return view('staff.wilayah.edit', compact('wilayah', 'tipe', 'kotas', 'kecamatans', 'id'));
     }
 
     public function update(Request $request, $id)

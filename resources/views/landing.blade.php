@@ -30,53 +30,47 @@
             <h2 class="text-4xl font-bold text-center text-gray-800 mb-4">Layanan</h2>
             <p class="text-center text-gray-600 text-lg mb-12">Pilihan Layanan dari SAPA untuk Pelapor</p>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
                 <!-- Layanan Pengaduan Card -->
-                <div class="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Layanan Pengaduan</h3>
-                    <p class="text-gray-600 mb-6">Menerapkan metode pembelajaran adaptif yang dapat membantu Code
-                        Friends untuk memaksimalkan pemahaman terhadap penerapan dari bahasa pemrograman.</p>
+                <div class="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Layanan Pengaduan</h3>
+                        <p class="text-gray-600 mb-6">Membantu pelapor untuk mengajukan pengaduan kekerasan terhadap perempuan.</p>
+                    </div>
                     <a href="{{ route('pengaduan.index') }}"
-                        class="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition hover:underline">More
+                        class="block bg-blue-500 text-white w-32 mx-auto px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition hover:underline mt-auto text-center">More
                     </a>
                 </div>
 
                 <!-- Track Pengaduan Card -->
-                <div class="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Track Pengaduan</h3>
-                    <p class="text-gray-600 mb-6">Menerapkan metode pembelajaran adaptif yang dapat membantu Code
-                        Friends untuk memaksimalkan pemahaman terhadap penerapan dari bahasa pemrograman.</p>
+                <div class="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Track Pengaduan</h3>
+                        <br>
+                        <p class="text-gray-600 mb-6">Membantu pelapor untuk melacak status pengaduan yang telah diajukan.</p>
+                    </div>
                     <a href="{{ route('tracking.index') }}"
-                        class="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition hover:underline">More</a>
+                        class="block bg-blue-500 text-white w-32 mx-auto px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition hover:underline mt-auto text-center">More</a>
                 </div>
 
                 <!-- Layanan Pendampingan Card -->
-                <div class="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Layanan Pendampingan</h3>
-                    <p class="text-gray-600 mb-6">Menerapkan metode pembelajaran adaptif yang dapat membantu Code
-                        Friends untuk memaksimalkan pemahaman terhadap penerapan dari bahasa pemrograman.</p>
+                <div class="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Layanan Pendampingan</h3>
+                        <p class="text-gray-600 mb-6">Membantu pelapor untuk mendapatkan pendampingan setelah pengaduan.</p>
+                    </div>
                     <a href="{{ route('pendampingan.index') }}"
-                        class="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition hover:underline">More</a>
+                        class="block bg-blue-500 text-white w-32 mx-auto px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition hover:underline mt-auto text-center">More</a>
                 </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 <!-- Layanan Konseling Card -->
-                <div class="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Layanan Konseling</h3>
-                    <p class="text-gray-600 mb-6">Menerapkan metode pembelajaran adaptif yang dapat membantu Code
-                        Friends untuk memaksimalkan pemahaman terhadap penerapan dari bahasa pemrograman.</p>
+                <div class="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Layanan Konseling</h3>
+                        <p class="text-gray-600 mb-6">Membantu pelapor untuk mendapatkan konseling khusus setelah pengaduan.</p>
+                    </div>
                     <a href="{{ route('konseling.index') }}"
-                        class="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition hover:underline">More</a>
-                </div>
-
-                <!-- Edukasi Card -->
-                <div class="bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Edukasi</h3>
-                    <p class="text-gray-600 mb-6">Menerapkan metode pembelajaran adaptif yang dapat membantu Code
-                        Friends untuk memaksimalkan pemahaman terhadap penerapan dari bahasa pemrograman.</p>
-                    <a href="#"
-                        class="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition hover:underline">More</a>
+                        class="block bg-blue-500 text-white w-32 mx-auto px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition hover:underline mt-auto text-center">More</a>
                 </div>
             </div>
         </div>

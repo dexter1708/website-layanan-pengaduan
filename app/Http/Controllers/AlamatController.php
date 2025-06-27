@@ -28,6 +28,32 @@ class AlamatController extends Controller
             'desa' => 'required|string|max:255',
             'RT' => 'required|integer',
             'RW' => 'required|integer',
+        ], [
+            'nama.required' => 'Nama wajib diisi.',
+            'nama.string' => 'Nama harus berupa teks.',
+            'nama.max' => 'Nama tidak boleh lebih dari 255 karakter.',
+            
+            'sebagai.required' => 'Sebagai wajib diisi.',
+            'sebagai.string' => 'Sebagai harus berupa teks.',
+            'sebagai.max' => 'Sebagai tidak boleh lebih dari 255 karakter.',
+            
+            'kota.required' => 'Kota wajib diisi.',
+            'kota.string' => 'Kota harus berupa teks.',
+            'kota.max' => 'Kota tidak boleh lebih dari 255 karakter.',
+            
+            'kecamatan.required' => 'Kecamatan wajib diisi.',
+            'kecamatan.string' => 'Kecamatan harus berupa teks.',
+            'kecamatan.max' => 'Kecamatan tidak boleh lebih dari 255 karakter.',
+            
+            'desa.required' => 'Desa wajib diisi.',
+            'desa.string' => 'Desa harus berupa teks.',
+            'desa.max' => 'Desa tidak boleh lebih dari 255 karakter.',
+            
+            'RT.required' => 'RT wajib diisi.',
+            'RT.integer' => 'RT harus berupa angka.',
+            
+            'RW.required' => 'RW wajib diisi.',
+            'RW.integer' => 'RW harus berupa angka.',
         ]);
 
         Alamat::create($request->all());
@@ -51,6 +77,32 @@ class AlamatController extends Controller
             'desa' => 'required|string|max:255',
             'RT' => 'required|integer',
             'RW' => 'required|integer',
+        ], [
+            'nama.required' => 'Nama wajib diisi.',
+            'nama.string' => 'Nama harus berupa teks.',
+            'nama.max' => 'Nama tidak boleh lebih dari 255 karakter.',
+            
+            'sebagai.required' => 'Sebagai wajib diisi.',
+            'sebagai.string' => 'Sebagai harus berupa teks.',
+            'sebagai.max' => 'Sebagai tidak boleh lebih dari 255 karakter.',
+            
+            'kota.required' => 'Kota wajib diisi.',
+            'kota.string' => 'Kota harus berupa teks.',
+            'kota.max' => 'Kota tidak boleh lebih dari 255 karakter.',
+            
+            'kecamatan.required' => 'Kecamatan wajib diisi.',
+            'kecamatan.string' => 'Kecamatan harus berupa teks.',
+            'kecamatan.max' => 'Kecamatan tidak boleh lebih dari 255 karakter.',
+            
+            'desa.required' => 'Desa wajib diisi.',
+            'desa.string' => 'Desa harus berupa teks.',
+            'desa.max' => 'Desa tidak boleh lebih dari 255 karakter.',
+            
+            'RT.required' => 'RT wajib diisi.',
+            'RT.integer' => 'RT harus berupa angka.',
+            
+            'RW.required' => 'RW wajib diisi.',
+            'RW.integer' => 'RW harus berupa angka.',
         ]);
 
         $alamat->update($request->all());

@@ -50,7 +50,7 @@
                     <table id="instrukturTable" class="min-w-full bg-white">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto</th>
+                                <!--<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto</th>-->
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posisi</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Layanan</th>
@@ -60,7 +60,7 @@
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($instrukturs as $instruktur)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <!--<td class="px-6 py-4 whitespace-nowrap">
                                         @if($instruktur->foto)
                                             <img src="{{ asset('storage/instruktur/' . $instruktur->foto) }}" 
                                                  alt="Foto {{ $instruktur->nama }}" 
@@ -72,24 +72,37 @@
                                                 </span>
                                             </div>
                                         @endif
-                                    </td>
+                                    </td>-->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $instruktur->nama }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $instruktur->posisi }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $instruktur->nama_layanan }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
                                             <a href="{{ route('staff.instruktur.edit', $instruktur->id) }}" class="text-yellow-600 hover:text-yellow-900">Edit</a>
-                                            <form action="{{ route('staff.instruktur.destroy', $instruktur->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus instruktur ini?');">
+                                            <button type="button" 
+                                                    class="text-red-600 hover:text-red-900" 
+                                                    onclick="showDeleteModal('delete-form-{{ $instruktur->id }}', 'delete-modal-{{ $instruktur->id }}')">
+                                                Hapus
+                                            </button>
+                                            
+                                            <!-- Hidden form for deletion -->
+                                            <form id="delete-form-{{ $instruktur->id }}" action="{{ route('staff.instruktur.destroy', $instruktur->id) }}" method="POST" class="hidden">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
                                             </form>
+                                            
+                                            <!-- Delete confirmation modal -->
+                                            <x-delete-confirmation-modal 
+                                                id="delete-modal-{{ $instruktur->id }}"
+                                                title="Konfirmasi Hapus Instruktur"
+                                                message="Apakah Anda yakin ingin menghapus data ini?"
+                                            />
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
                                         Tidak ada data instruktur
                                     </td>
                                 </tr>

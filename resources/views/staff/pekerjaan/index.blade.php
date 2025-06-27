@@ -49,11 +49,24 @@
                                     <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">{{ $item->pekerjaan }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
                                         <a href="{{ route('staff.pekerjaan.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                        <form action="{{ route('staff.pekerjaan.destroy', $item) }}" method="POST" class="inline">
+                                        <button type="button" 
+                                                class="text-red-600 hover:text-red-900" 
+                                                onclick="showDeleteModal('delete-form-{{ $item->id }}', 'delete-modal-{{ $item->id }}')">
+                                            Hapus
+                                        </button>
+                                        
+                                        <!-- Hidden form for deletion -->
+                                        <form id="delete-form-{{ $item->id }}" action="{{ route('staff.pekerjaan.destroy', $item) }}" method="POST" class="hidden">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Apakah Anda yakin ingin menghapus pekerjaan ini?')">Hapus</button>
                                         </form>
+                                        
+                                        <!-- Delete confirmation modal -->
+                                        <x-delete-confirmation-modal 
+                                            id="delete-modal-{{ $item->id }}"
+                                            title="Konfirmasi Hapus Pekerjaan"
+                                            message="Apakah Anda yakin ingin menghapus data ini?"
+                                        />
                                     </td>
                                 </tr>
                             @empty

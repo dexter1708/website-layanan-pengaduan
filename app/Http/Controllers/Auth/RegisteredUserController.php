@@ -42,10 +42,48 @@ class RegisteredUserController extends Controller
             'no_telepon' => ['required', 'string', 'regex:/^08[0-9]{8,11}$/', 'unique:users,no_telepon'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'kota' => ['required', 'exists:wilayah,kota_id'],
-            'kecamatan' => ['required', 'exists:wilayah,kecamatan_id'],  // Validasi kecamatan berdasarkan kota
-            'desa' => ['required', 'exists:wilayah,desa_id'],  // Validasi desa berdasarkan kecamatan
+            'kecamatan' => ['required', 'exists:wilayah,kecamatan_id'],
+            'desa' => ['required', 'exists:wilayah,desa_id'],
             'RT' => ['required', 'numeric'],
             'RW' => ['required', 'numeric'],
+        ], [
+            'name.required' => 'Nama wajib diisi.',
+            'name.string' => 'Nama harus berupa teks.',
+            'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',
+            
+            'email.required' => 'Email wajib diisi.',
+            'email.string' => 'Email harus berupa teks.',
+            'email.lowercase' => 'Email harus menggunakan huruf kecil.',
+            'email.email' => 'Format email tidak valid.',
+            'email.max' => 'Email tidak boleh lebih dari 255 karakter.',
+            'email.unique' => 'Email sudah digunakan.',
+            
+            'nik.required' => 'NIK wajib diisi.',
+            'nik.string' => 'NIK harus berupa teks.',
+            'nik.unique' => 'NIK sudah digunakan.',
+            
+            'no_telepon.required' => 'Nomor telepon wajib diisi.',
+            'no_telepon.string' => 'Nomor telepon harus berupa teks.',
+            'no_telepon.regex' => 'Format nomor telepon tidak valid (gunakan format 08xxxxxxxxxx).',
+            'no_telepon.unique' => 'Nomor telepon sudah digunakan.',
+            
+            'password.required' => 'Password wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            
+            'kota.required' => 'Kota wajib dipilih.',
+            'kota.exists' => 'Kota yang dipilih tidak valid.',
+            
+            'kecamatan.required' => 'Kecamatan wajib dipilih.',
+            'kecamatan.exists' => 'Kecamatan yang dipilih tidak valid.',
+            
+            'desa.required' => 'Desa wajib dipilih.',
+            'desa.exists' => 'Desa yang dipilih tidak valid.',
+            
+            'RT.required' => 'RT wajib diisi.',
+            'RT.numeric' => 'RT harus berupa angka.',
+            
+            'RW.required' => 'RW wajib diisi.',
+            'RW.numeric' => 'RW harus berupa angka.',
         ]);
         
         $wilayah = Wilayah::where('kota_id', $request->kota)

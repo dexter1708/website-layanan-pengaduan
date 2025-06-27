@@ -9,22 +9,16 @@
                 </div>
 
                 <!-- Links Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 text-sm text-white">
+                <div class="grid grid-cols-2 md:grid-cols-2 gap-6 text-sm text-white">
                     <div class="space-y-1">
                         <a href="{{ url('/') }}" class="hover:underline block">Homepage</a>
                         <a href="{{ route('dashboard') }}" class="hover:underline block">Dashboard</a>
-                    </div>
-                    <div class="space-y-1">
                         <a href="{{ route('pengaduan.index') }}" class="hover:underline block">Layanan Pengaduan</a>
                         <a href="{{ route('tracking.index') }}" class="hover:underline block">Track Pengaduan</a>
-                        <a href="{{ route('pendampingan.index') }}" class="hover:underline block">Layanan
-                            Pendampingan</a>
-                        <a href="{{ route('konseling.index') }}" class="hover:underline block">Layanan Konseling</a>
                     </div>
                     <div class="space-y-1">
-                        <a href="#" class="hover:underline block">Edukasi</a>
-                        <a href="#" class="hover:underline block">About</a>
-                        <a href="{{ route('profile.show') }}" class="hover:underline block">Profile</a>
+                        <a href="{{ route('pendampingan.index') }}" class="hover:underline block">Layanan Pendampingan</a>
+                        <a href="{{ route('konseling.index') }}" class="hover:underline block">Layanan Konseling</a>
                     </div>
                 </div>
             </div>

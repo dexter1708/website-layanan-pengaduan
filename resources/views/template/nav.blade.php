@@ -98,8 +98,7 @@
                 @endif
 
                 @guest
-                    <a href="#" class="hover:text-blue-600">Edukasi</a>
-                    <a href="#" class="hover:text-blue-600">About</a>
+                    <!-- About link dihapus -->
                 @endguest
             </div>
             

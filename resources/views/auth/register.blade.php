@@ -55,6 +55,22 @@
             border-color: #4299e1;
             box-shadow: 0 0 0 1px #4299e1;
         }
+        .password-container {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .password-toggle:hover {
+            color: #374151;
+        }
         .btn-register {
             width: 100%;
             padding: 0.75rem;
@@ -125,14 +141,24 @@
                 <!-- Password -->
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
-                    <input id="password" type="password" name="password" required autocomplete="new-password" class="form-input" placeholder="Password">
+                    <div class="password-container">
+                        <input id="password" type="password" name="password" required autocomplete="new-password" class="form-input pr-10" placeholder="Password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('password', 'eyeIcon1')">
+                            <i id="eyeIcon1" class="fas fa-eye"></i>
+                        </button>
+                    </div>
                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
                 
                 <!-- Konfirmasi Password -->
                 <div class="form-group">
                     <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                    <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" class="form-input" placeholder="Konfirmasi Password">
+                    <div class="password-container">
+                        <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" class="form-input pr-10" placeholder="Konfirmasi Password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('password_confirmation', 'eyeIcon2')">
+                            <i id="eyeIcon2" class="fas fa-eye"></i>
+                        </button>
+                    </div>
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                 </div>
                 
@@ -193,7 +219,26 @@
         </div>
     </div>
 
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
     <script>
+        // Function untuk toggle password visibility
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const kotaSelect = document.getElementById('kota');
             const kecamatanSelect = document.getElementById('kecamatan');
