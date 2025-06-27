@@ -78,7 +78,6 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="{{ route('pengaduan.show', $pengaduan->id) }}" class="text-blue-600 hover:text-blue-900 font-semibold">Lihat Detail</a>
-                            <a href="{{ route('pengaduan.riwayat') }}" class="text-blue-600 hover:text-blue-900 font-semibold ml-4">Riwayat</a>
                         </td>
                     </tr>
                     @endforeach
