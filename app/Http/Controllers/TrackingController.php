@@ -83,6 +83,6 @@ class TrackingController extends Controller
             'keterangan' => $request->keterangan
         ]);
 
-        return redirect()->route('pengaduan.show', $pengaduan->id)->with('success', 'Status pengaduan berhasil diperbarui');
+        return redirect()->route('tracking.show', $pengaduan->id)->with('success', 'Status pengaduan berhasil diperbarui');
     }
 } 
