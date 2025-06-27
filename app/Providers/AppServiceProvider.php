@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (app()->environment('production')) {
+        if (app()->environment('development')) {
             URL::forceScheme('https');
             // Cara Laravel modern: gunakan trusted proxies dari config jika perlu
             // Jika tetap error, hapus baris trusted proxy dan cukup forceScheme saja
