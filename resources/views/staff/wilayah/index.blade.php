@@ -87,10 +87,10 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
                                         <a href="{{ route('staff.wilayah.edit', ['type' => 'kota', 'id' => $item->kota_id]) }}" class="text-yellow-600 hover:text-yellow-900">Edit</a>
-                                        <form action="{{ route('staff.wilayah.destroy', ['type' => 'kota', 'id' => $item->kota_id]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus kota ini? Ini akan menghapus semua kecamatan dan desa di dalamnya.');">
+                                        <form id="delete-kota-{{ $item->kota_id }}" action="{{ route('staff.wilayah.destroy', ['type' => 'kota', 'id' => $item->kota_id]) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
+                                            <button type="button" class="text-red-600 hover:text-red-900" onclick="showDeleteModal('delete-kota-{{ $item->kota_id }}', 'delete-modal')">Hapus</button>
                                         </form>
                                     </div>
                                 </td>
@@ -118,10 +118,10 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
                                         <a href="{{ route('staff.wilayah.edit', ['type' => 'kecamatan', 'id' => $item->kecamatan_id]) }}" class="text-yellow-600 hover:text-yellow-900">Edit</a>
-                                        <form action="{{ route('staff.wilayah.destroy', ['type' => 'kecamatan', 'id' => $item->kecamatan_id]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus kecamatan ini? Ini akan menghapus semua desa di dalamnya.');">
+                                        <form id="delete-kecamatan-{{ $item->kecamatan_id }}" action="{{ route('staff.wilayah.destroy', ['type' => 'kecamatan', 'id' => $item->kecamatan_id]) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
+                                            <button type="button" class="text-red-600 hover:text-red-900" onclick="showDeleteModal('delete-kecamatan-{{ $item->kecamatan_id }}', 'delete-modal')">Hapus</button>
                                         </form>
                                     </div>
                                 </td>
@@ -150,11 +150,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $item->desa_nama }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('staff.wilayah.edit', ['type' => 'desa', 'id' => $item->desa_id]) }}" class="text-yellow-600 hover:text-yellow-900">Edit</a>
-                                        <form action="{{ route('staff.wilayah.destroy', ['type' => 'desa', 'id' => $item->id]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus desa ini?');">
+                                        <a href="{{ route('staff.wilayah.edit', ['type' => 'desa', 'id' => $item->id]) }}" class="text-yellow-600 hover:text-yellow-900">Edit</a>
+                                        <form id="delete-desa-{{ $item->id }}" action="{{ route('staff.wilayah.destroy', ['type' => 'desa', 'id' => $item->id]) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
+                                            <button type="button" class="text-red-600 hover:text-red-900" onclick="showDeleteModal('delete-desa-{{ $item->id }}', 'delete-modal')">Hapus</button>
                                         </form>
                                     </div>
                                 </td>
@@ -192,5 +192,8 @@
         activeButton.classList.remove('border-transparent', 'text-gray-500');
     }
 </script>
+
+{{-- Tambahkan modal konfirmasi hapus di bawah tabel --}}
+<x-delete-confirmation-modal id="delete-modal" title="Konfirmasi Hapus" message="Apakah Anda yakin ingin menghapus data ini?" confirmText="Hapus" cancelText="Batal" />
 
 @endsection 

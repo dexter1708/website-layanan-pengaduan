@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Wilayah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class WilayahController extends Controller
@@ -94,16 +95,25 @@ class WilayahController extends Controller
                 // Get next available global IDs
                 $nextKotaId = (Wilayah::max('kota_id') ?? 0) + 1;
                 $nextKecamatanId = (Wilayah::max('kecamatan_id') ?? 0) + 1;
-                $nextDesaId = (Wilayah::max('desa_id') ?? 0) + 1;
-                
-                // Create a new wilayah entry for the kota with its default kecamatan and desa
+                $nextDesaId = (Wilayah::max('id') ?? 0) + 1;
+
+                // 1. Insert/cek data desa (parent) dulu, isi juga kolom id
+                $desa = Wilayah::firstOrCreate(
+                    ['id' => $nextDesaId],
+                    [
+                        'desa_id' => $nextDesaId,
+                        'desa_nama' => $request->desa_nama
+                    ]
+                );
+
+                // 2. Baru insert data kota (child)
                 $wilayah = new Wilayah();
                 $wilayah->kota_id = $nextKotaId;
                 $wilayah->kota_nama = $request->nama;
                 $wilayah->kecamatan_id = $nextKecamatanId;
                 $wilayah->kecamatan_nama = $request->kecamatan_nama;
-                $wilayah->desa_id = $nextDesaId;
-                $wilayah->desa_nama = $request->desa_nama;
+                $wilayah->desa_id = $desa->id;
+                $wilayah->desa_nama = $desa->desa_nama;
                 $wilayah->save();
                 break;
 
@@ -145,16 +155,25 @@ class WilayahController extends Controller
 
                 // Get next available global IDs for kecamatan and its default desa
                 $nextKecamatanId = (Wilayah::max('kecamatan_id') ?? 0) + 1;
-                $nextDesaId = (Wilayah::max('desa_id') ?? 0) + 1;
-                
-                // Create a new wilayah entry for the kecamatan with its default desa
+                $nextDesaId = (Wilayah::max('id') ?? 0) + 1;
+
+                // 1. Insert/cek data desa (parent) dulu, isi juga kolom id
+                $desa = Wilayah::firstOrCreate(
+                    ['id' => $nextDesaId],
+                    [
+                        'desa_id' => $nextDesaId,
+                        'desa_nama' => $request->desa_nama
+                    ]
+                );
+
+                // 2. Baru insert data kecamatan (child)
                 $wilayah = new Wilayah();
                 $wilayah->kota_id = $kotaInfo->kota_id;
                 $wilayah->kota_nama = $kotaInfo->kota_nama;
                 $wilayah->kecamatan_id = $nextKecamatanId;
                 $wilayah->kecamatan_nama = $request->nama;
-                $wilayah->desa_id = $nextDesaId;
-                $wilayah->desa_nama = $request->desa_nama;
+                $wilayah->desa_id = $desa->id;
+                $wilayah->desa_nama = $desa->desa_nama;
                 $wilayah->save();
                 break;
 
@@ -227,6 +246,19 @@ class WilayahController extends Controller
 
     public function edit($type, $id)
     {
+        // Debug selesai, hapus dd()
+        // $allData = Wilayah::all();
+        // $specificData = Wilayah::where('id', $id)->first();
+        // $desaData = Wilayah::where('id', $id)->whereNotNull('desa_nama')->first();
+        // dd([
+        //     'type' => $type,
+        //     'id' => $id,
+        //     'all_data_count' => $allData->count(),
+        //     'specific_data' => $specificData ? $specificData->toArray() : null,
+        //     'desa_data' => $desaData ? $desaData->toArray() : null,
+        //     'first_5_records' => $allData->take(5)->toArray()
+        // ]);
+        
         $wilayah = null;
 
         switch ($type) {
@@ -237,7 +269,8 @@ class WilayahController extends Controller
                 $wilayah = Wilayah::where('kecamatan_id', $id)->whereNotNull('kecamatan_nama')->first();
                 break;
             case 'desa':
-                $wilayah = Wilayah::where('desa_id', $id)->whereNotNull('desa_nama')->first();
+                // Untuk desa, cari berdasarkan primary key (id) bukan desa_id
+                $wilayah = Wilayah::where('id', $id)->whereNotNull('desa_nama')->first();
                 break;
             default:
                 return redirect()->route('staff.wilayah.index')
@@ -273,12 +306,24 @@ class WilayahController extends Controller
         return view('staff.wilayah.edit', compact('wilayah', 'tipe', 'kotas', 'kecamatans', 'id'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $type, $id)
     {
-        // Gunakan helper function untuk mencari wilayah
-        $result = $this->findWilayahById($id);
-        $wilayah = $result['wilayah'];
-        $tipe = $result['tipe'];
+        // Cari wilayah sesuai tipe
+        $wilayah = null;
+        switch ($type) {
+            case 'kota':
+                $wilayah = Wilayah::where('kota_id', $id)->whereNotNull('kota_nama')->first();
+                break;
+            case 'kecamatan':
+                $wilayah = Wilayah::where('kecamatan_id', $id)->whereNotNull('kecamatan_nama')->first();
+                break;
+            case 'desa':
+                $wilayah = Wilayah::where('id', $id)->whereNotNull('desa_nama')->first();
+                break;
+            default:
+                return redirect()->route('staff.wilayah.index')
+                    ->with('error', 'Tipe wilayah tidak valid.');
+        }
 
         if (!$wilayah) {
             return redirect()->route('staff.wilayah.index')
@@ -290,23 +335,18 @@ class WilayahController extends Controller
         ]);
 
         try {
-            switch ($tipe) {
+            switch ($type) {
                 case 'kota':
                     // Update nama kota di semua record yang memiliki kota_id ini
                     Wilayah::where('kota_id', $id)->update(['kota_nama' => $request->nama]);
                     break;
                 case 'kecamatan':
                     // Update nama kecamatan di semua record yang memiliki kecamatan_id ini
-                    Wilayah::where('kota_id', $wilayah->kota_id)
-                          ->where('kecamatan_id', $id)
-                          ->update(['kecamatan_nama' => $request->nama]);
+                    Wilayah::where('kecamatan_id', $id)->update(['kecamatan_nama' => $request->nama]);
                     break;
                 case 'desa':
                     // Update nama desa di record yang spesifik
-                    Wilayah::where('kota_id', $wilayah->kota_id)
-                          ->where('kecamatan_id', $wilayah->kecamatan_id)
-                          ->where('desa_id', $id)
-                          ->update(['desa_nama' => $request->nama]);
+                    Wilayah::where('id', $id)->update(['desa_nama' => $request->nama]);
                     break;
             }
 
@@ -320,13 +360,45 @@ class WilayahController extends Controller
 
     public function destroy($type, $id)
     {
-        $wilayah = Wilayah::find($id);
+        $wilayah = null;
+
+        switch ($type) {
+            case 'kota':
+                $wilayah = Wilayah::where('kota_id', $id)->whereNotNull('kota_nama')->first();
+                break;
+            case 'kecamatan':
+                $wilayah = Wilayah::where('kecamatan_id', $id)->whereNotNull('kecamatan_nama')->first();
+                break;
+            case 'desa':
+                // Untuk desa, cari berdasarkan primary key (id) bukan desa_id
+                $wilayah = Wilayah::where('id', $id)->whereNotNull('desa_nama')->first();
+                break;
+            default:
+                return redirect()->route('staff.wilayah.index')
+                    ->with('error', 'Tipe wilayah tidak valid.');
+        }
+
         if (!$wilayah) {
             return redirect()->route('staff.wilayah.index')
                 ->with('error', 'Wilayah tidak ditemukan');
         }
+
         try {
-            $wilayah->delete();
+            switch ($type) {
+                case 'kota':
+                    // Hapus semua record yang memiliki kota_id ini
+                    Wilayah::where('kota_id', $id)->delete();
+                    break;
+                case 'kecamatan':
+                    // Hapus semua record yang memiliki kecamatan_id ini
+                    Wilayah::where('kecamatan_id', $id)->delete();
+                    break;
+                case 'desa':
+                    // Hapus record desa spesifik
+                    $wilayah->delete();
+                    break;
+            }
+            
             return redirect()->route('staff.wilayah.index')
                 ->with('success', 'Wilayah berhasil dihapus');
         } catch (\Exception $e) {
@@ -358,25 +430,5 @@ class WilayahController extends Controller
                         ->get();
 
         return response()->json($desas);
-    }
-
-    /**
-     * Helper function untuk mencari wilayah berdasarkan ID
-     */
-    private function findWilayahById($id)
-    {
-        $wilayah = Wilayah::find($id);
-        if (!$wilayah) return ['wilayah' => null, 'tipe' => null];
-        // Tentukan tipe berdasarkan field yang terisi
-        if (!empty($wilayah->desa_nama)) {
-            $tipe = 'desa';
-        } elseif (!empty($wilayah->kecamatan_nama)) {
-            $tipe = 'kecamatan';
-        } elseif (!empty($wilayah->kota_nama)) {
-            $tipe = 'kota';
-        } else {
-            $tipe = null;
-        }
-        return ['wilayah' => $wilayah, 'tipe' => $tipe];
     }
 }
