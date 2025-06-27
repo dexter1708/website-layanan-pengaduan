@@ -110,14 +110,8 @@ class KonselingController extends Controller
             'jadwal_konseling' => $request->tanggal_konseling . ' ' . $request->waktu_konseling,
             'tempat_konseling' => $request->tempat_konseling,
             'jenis_layanan' => $request->jenis_layanan,
+            'konfirmasi' => $request->konfirmasi,
         ];
-        
-        if ($konseling->konfirmasi === Konseling::STATUS_BUTUH_KONFIRMASI_STAFF) {
-            $updateData['konfirmasi'] = Konseling::STATUS_MENUNGGU_KONFIRMASI_USER;
-        } elseif ($request->filled('konfirmasi')) {
-            $updateData['konfirmasi'] = $request->konfirmasi;
-        }
-        
         $konseling->update($updateData);
 
         return redirect()->route('konseling.index')->with('success', 'Jadwal konseling berhasil diperbarui.');
