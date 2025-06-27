@@ -95,7 +95,7 @@
                                 <h3 class="font-bold text-lg text-gray-800">
                                     Status: {{ ucfirst(str_replace('_', ' ', $histori->status_sesudah)) }}
                                 </h3>
-                                <p class="text-sm text-gray-500 mb-2">{{ $histori->created_at->format('d F Y, H:i') }}</p>
+                                <p class="text-sm text-gray-500 mb-2">{{ $histori->created_at->format('d/m/Y H:i') }}</p>
                                 @if($histori->keterangan)
                                     <p class="bg-gray-50 p-3 rounded-md text-gray-700 italic">"{{ $histori->keterangan }}"</p>
                                 @endif
