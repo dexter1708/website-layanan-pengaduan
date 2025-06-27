@@ -1,171 +1,73 @@
-<x-guest-layout>
-    <style>
-        body {
-            background-color: #f0f2f5;
-        }
-        .register-container {
-            background-color: white;
-            padding: 2.5rem;
-            width: 75%;
-            margin: 2rem auto;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        .register-logo {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 1rem;
-        }
-        .register-logo img {
-            height: 5rem;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(1, minmax(0, 1fr));
-            gap: 1.5rem;
-        }
-        @media (min-width: 768px) {
-            .form-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-        .form-group {
-            margin-bottom: 0;
-        }
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #4a5568;
-            font-size: 0.875rem;
-        }
-        .form-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.375rem;
-            background-color: #f7fafc;
-            transition: border-color 0.2s;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: #4299e1;
-            box-shadow: 0 0 0 1px #4299e1;
-        }
-        .password-container {
-            position: relative;
-        }
-        .password-toggle {
-            position: absolute;
-            right: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #6b7280;
-        }
-        .password-toggle:hover {
-            color: #374151;
-        }
-        .btn-register {
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            background-color: #3b82f6;
-            color: white;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .btn-register:hover {
-            background-color: #2563eb;
-        }
-        .login-link {
-            text-align: center;
-            margin-top: 1rem;
-            font-size: 0.875rem;
-            color: #4a5568;
-        }
-        .login-link a {
-            color: #3b82f6;
-            font-weight: 500;
-            text-decoration: none;
-        }
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
-
-    <div class="register-container">
-        <div class="register-logo">
-            <img src="{{ asset('assets/image.png') }}" alt="Logo">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="min-h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('{{ asset('assets/image7.jpg') }}')">
+    <div class="w-full max-w-3xl bg-white rounded-xl shadow-lg p-8 md:p-12 mx-auto">
+        <div class="flex flex-col items-center mb-6">
+            <img src="{{ asset('assets/image.png') }}" alt="Logo" class="h-16 mb-2">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Register</h2>
         </div>
-        
-        <form method="POST" action="{{ route('register') }}" class="mt-8">
+        <form method="POST" action="{{ route('register') }}" class="mt-4">
             @csrf
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Register</h2>
-            <div class="form-grid">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Nama Lengkap -->
-                <div class="form-group">
-                    <label for="name" class="form-label">Nama Lengkap</label>
-                    <input id="name" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" class="form-input" placeholder="Nama">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                    <input id="name" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Nama">
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                 </div>
-                
                 <!-- NIK -->
-                <div class="form-group">
-                    <label for="nik" class="form-label">NIK</label>
-                    <input id="nik" type="text" name="nik" :value="old('nik')" required class="form-input" placeholder="NIK">
+                <div>
+                    <label for="nik" class="block text-sm font-medium text-gray-700 mb-1">NIK</label>
+                    <input id="nik" type="text" name="nik" :value="old('nik')" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="NIK">
                     <x-input-error :messages="$errors->get('nik')" class="mt-2" />
                 </div>
-                
                 <!-- Email -->
-                <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
-                    <input id="email" type="email" name="email" :value="old('email')" required autocomplete="username" class="form-input" placeholder="Email">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input id="email" type="email" name="email" :value="old('email')" required autocomplete="username" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Email">
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
-                
                 <!-- No Handphone -->
-                <div class="form-group">
-                    <label for="no_telepon" class="form-label">No Handphone</label>
-                    <input id="no_telepon" type="tel" name="no_telepon" :value="old('no_telepon')" required class="form-input" placeholder="No Handphone">
+                <div>
+                    <label for="no_telepon" class="block text-sm font-medium text-gray-700 mb-1">No Handphone</label>
+                    <input id="no_telepon" type="tel" name="no_telepon" :value="old('no_telepon')" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="No Handphone">
                     <x-input-error :messages="$errors->get('no_telepon')" class="mt-2" />
                 </div>
-                
                 <!-- Password -->
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="password-container">
-                        <input id="password" type="password" name="password" required autocomplete="new-password" class="form-input pr-10" placeholder="Password">
-                        <button type="button" class="password-toggle" onclick="togglePassword('password', 'eyeIcon1')">
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <div class="relative">
+                        <input id="password" type="password" name="password" required autocomplete="new-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 pr-10" placeholder="Password">
+                        <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onclick="togglePassword('password', 'eyeIcon1')">
                             <i id="eyeIcon1" class="fas fa-eye"></i>
                         </button>
                     </div>
                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
-                
                 <!-- Konfirmasi Password -->
-                <div class="form-group">
-                    <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                    <div class="password-container">
-                        <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" class="form-input pr-10" placeholder="Konfirmasi Password">
-                        <button type="button" class="password-toggle" onclick="togglePassword('password_confirmation', 'eyeIcon2')">
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
+                    <div class="relative">
+                        <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 pr-10" placeholder="Konfirmasi Password">
+                        <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" onclick="togglePassword('password_confirmation', 'eyeIcon2')">
                             <i id="eyeIcon2" class="fas fa-eye"></i>
                         </button>
                     </div>
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                 </div>
-                
                 <!-- Kabupaten/Kota -->
-                <div class="form-group">
-                    <label for="kota" class="form-label">Kabupaten/ Kota</label>
-                    <select id="kota" name="kota" required class="form-input">
+                <div>
+                    <label for="kota" class="block text-sm font-medium text-gray-700 mb-1">Kabupaten/ Kota</label>
+                    <select id="kota" name="kota" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         <option value="">--Pilih Kabupaten/ Kota--</option>
                         @foreach ($kotas as $kota)
                             <option value="{{ $kota->kota_id }}" {{ old('kota') == $kota->kota_id ? 'selected' : '' }}>{{ $kota->kota_nama }}</option>
@@ -173,61 +75,45 @@
                     </select>
                     <x-input-error :messages="$errors->get('kota')" class="mt-2" />
                 </div>
-                
                 <!-- Kecamatan -->
-                <div class="form-group">
-                    <label for="kecamatan" class="form-label">Kecamatan</label>
-                    <select id="kecamatan" name="kecamatan" required class="form-input">
+                <div>
+                    <label for="kecamatan" class="block text-sm font-medium text-gray-700 mb-1">Kecamatan</label>
+                    <select id="kecamatan" name="kecamatan" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         <option value="">--Pilih Kecamatan--</option>
                     </select>
                     <x-input-error :messages="$errors->get('kecamatan')" class="mt-2" />
                 </div>
-
-                <!-- Kelurahan/Desa -->
-                <div class="form-group">
-                    <label for="desa" class="form-label">Kelurahan</label>
-                    <select id="desa" name="desa" required class="form-input">
+                <!-- Kelurahan -->
+                <div>
+                    <label for="desa" class="block text-sm font-medium text-gray-700 mb-1">Kelurahan</label>
+                    <select id="desa" name="desa" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         <option value="">--Pilih Kelurahan--</option>
                     </select>
                     <x-input-error :messages="$errors->get('desa')" class="mt-2" />
                 </div>
-                
                 <!-- RT -->
-                <div class="form-group">
-                    <label for="RT" class="form-label">RT</label>
-                    <input id="RT" type="text" name="RT" value="{{ old('RT') }}" required class="form-input" placeholder="RT">
+                <div>
+                    <label for="RT" class="block text-sm font-medium text-gray-700 mb-1">RT</label>
+                    <input id="RT" type="text" name="RT" value="{{ old('RT') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="RT">
                     <x-input-error :messages="$errors->get('RT')" class="mt-2" />
                 </div>
-
                 <!-- RW -->
-                <div class="form-group">
-                    <label for="RW" class="form-label">RW</label>
-                    <input id="RW" type="text" name="RW" value="{{ old('RW') }}" required class="form-input" placeholder="RW">
+                <div>
+                    <label for="RW" class="block text-sm font-medium text-gray-700 mb-1">RW</label>
+                    <input id="RW" type="text" name="RW" value="{{ old('RW') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="RW">
                     <x-input-error :messages="$errors->get('RW')" class="mt-2" />
                 </div>
-
-                <div class="form-group full-width">
-                    <button type="submit" class="btn-register">
-                        Registrasi
-                    </button>
-                </div>
+            </div>
+            <button type="submit" class="w-full mt-8 py-3 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 transition">Registrasi</button>
+            <div class="text-center mt-4 text-sm text-gray-600">
+                Sudah punya akun? <a href="{{ route('login') }}" class="text-blue-500 hover:underline">Login disini</a>
             </div>
         </form>
-
-        <div class="login-link">
-            Sudah punya akun? <a href="{{ route('login') }}">Login disini</a>
-        </div>
     </div>
-
-    <!-- Font Awesome untuk ikon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
     <script>
-        // Function untuk toggle password visibility
         function togglePassword(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
-            
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.classList.remove('fa-eye');
@@ -317,4 +203,5 @@
             }
         });
     </script>
-</x-guest-layout>
+</body>
+</html>
