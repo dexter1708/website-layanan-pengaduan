@@ -118,14 +118,14 @@
                         </td>
                     </tr>
                 @empty
-                    @for($i = 0; $i < 10; $i++)
-                        <tr class="animate-pulse">
-                            @for($j = 0; $j < 9; $j++)
-                                <td class="p-3 text-gray-200 bg-gray-50">-</td>
-                            @endfor
-                        </tr>
-                    @endfor
                 @endforelse
+                @for($i = $konselings->count(); $i < 10; $i++)
+                    <tr class="animate-pulse">
+                        @for($j = 0; $j < 9; $j++)
+                            <td class="p-3 text-gray-200 bg-gray-50">-</td>
+                        @endfor
+                    </tr>
+                @endfor
             </tbody>
         </table>
     </div>

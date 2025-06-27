@@ -121,7 +121,7 @@
         <table id="tablePendampingan" class="min-w-full text-xs sm:text-sm divide-y divide-gray-200">
             <thead class="bg-blue-600 text-white text-center text-xs sm:text-sm">
                 <tr>
-                    <th class="p-3">No Pengaduan</th>
+                    <th class="p-3">ID Pengaduan</th>
                     <th class="p-3">Nama Korban</th>
                     <th class="p-3">Nama Pendamping</th>
                     <th class="p-3">Tanggal</th>
@@ -168,14 +168,14 @@
                         </td>
                     </tr>
                 @empty
-                    @for($i = 0; $i < 10; $i++)
-                        <tr class="animate-pulse">
-                            @for($j = 0; $j < 9; $j++)
-                                <td class="p-3 text-gray-200 bg-gray-50">-</td>
-                            @endfor
-                        </tr>
-                    @endfor
                 @endforelse
+                @for($i = $pendampingans->count(); $i < 10; $i++)
+                    <tr class="animate-pulse">
+                        @for($j = 0; $j < 9; $j++)
+                            <td class="p-3 text-gray-200 bg-gray-50">-</td>
+                        @endfor
+                    </tr>
+                @endfor
             </tbody>
         </table>
     </div>
