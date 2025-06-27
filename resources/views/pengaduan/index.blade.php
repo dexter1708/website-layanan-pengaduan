@@ -61,7 +61,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($pengaduans as $index => $pengaduan)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{{ $pengaduan->id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{{ $index + 1 }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ \Carbon\Carbon::parse($pengaduan->created_at)->format('d/m/Y') }}
                         </td>
@@ -77,13 +77,18 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="{{ route('pengaduan.show', $pengaduan->id) }}" 
-                               class="text-blue-600 hover:text-blue-900 font-semibold">
-                                Lihat Detail
-                            </a>
+                            <a href="{{ route('pengaduan.show', $pengaduan->id) }}" class="text-blue-600 hover:text-blue-900 font-semibold">Lihat Detail</a>
+                            <a href="{{ route('pengaduan.riwayat') }}" class="text-blue-600 hover:text-blue-900 font-semibold ml-4">Riwayat</a>
                         </td>
                     </tr>
                     @endforeach
+                    @for($i = $pengaduans->count(); $i < 5; $i++)
+                    <tr class="animate-pulse">
+                        @for($j = 0; $j < 5; $j++)
+                            <td class="p-3 text-gray-200 bg-gray-50">-</td>
+                        @endfor
+                    </tr>
+                    @endfor
                 </tbody>
             </table>
         </div>

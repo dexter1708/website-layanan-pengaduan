@@ -99,11 +99,11 @@
                                 @if($histori->keterangan)
                                     <p class="bg-gray-50 p-3 rounded-md text-gray-700 italic">"{{ $histori->keterangan }}"</p>
                                 @endif
-                                @if($histori->changedByUser)
-                                    <p class="text-xs text-gray-400 mt-2">Diubah oleh: {{ $histori->changedByUser->name ?? 'Sistem' }}</p>
-                                @endif
                             </div>
+                            <br>
+                            <br>
                         </div>
+                        <br>
                     @empty
                         <p class="ml-10 text-gray-500">Belum ada riwayat perubahan status untuk pengaduan ini.</p>
                     @endforelse

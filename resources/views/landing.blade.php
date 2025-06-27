@@ -11,7 +11,7 @@
                     <h2 class="text-2xl font-semibold text-gray-700 mb-6">Sahabat Perempuan dan Anak</h2>
                     <p class="text-gray-600 text-base mb-8 leading-relaxed">
                         SAPA hadir sebagai layanan responsif untuk mendampingi perempuan dan anak dalam situasi darurat
-                        maupun kebutuhan pendampingan khusus.
+                        maupun kebutuhan pendampingan khusus. 
                     </p>
                 </div>
 
