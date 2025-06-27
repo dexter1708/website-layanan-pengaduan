@@ -25,8 +25,8 @@
     $(document).ready(function () {
         $('#tableKonseling').DataTable({
             responsive: true,
-            order: [[0, 'desc']], // Adjusted index for ID Pengaduan
-            columnDefs: [{ orderable: false, targets: [7] }], // Adjusted index for Aksi column
+            order: [[0, 'desc']], // Default sort by ID Pengaduan descending
+            columnDefs: [{ orderable: false, targets: [8] }], // Fixed index for Aksi column (9 columns total, index 0-8)
             language: {
                 search: "Cari:",
                 lengthMenu: "Tampilkan _MENU_ entri",
@@ -70,6 +70,16 @@
         </div>
     @endif
 
+    @if($konselings->isEmpty())
+        <div class="w-full py-2 flex flex-col items-center justify-center text-gray-400">
+            <span class="inline-flex items-center gap-2 text-sm">
+                <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Tidak ada jadwal konselingyang diajukan.
+            </span>
+        </div>
+    @endif
     <!-- Tabel -->
     <div class="table-responsive bg-white rounded-lg p-4 shadow-sm border border-gray-200">
         <table id="tableKonseling" class="min-w-full text-xs sm:text-sm divide-y divide-gray-200">
@@ -108,11 +118,13 @@
                         </td>
                     </tr>
                 @empty
-                    <tr>
-                        <td colspan="9" class="p-4 text-center text-gray-500">
-                            Tidak ada jadwal konseling yang diajukan.
-                        </td>
-                    </tr>
+                    @for($i = 0; $i < 10; $i++)
+                        <tr class="animate-pulse">
+                            @for($j = 0; $j < 9; $j++)
+                                <td class="p-3 text-gray-200 bg-gray-50">-</td>
+                            @endfor
+                        </tr>
+                    @endfor
                 @endforelse
             </tbody>
         </table>

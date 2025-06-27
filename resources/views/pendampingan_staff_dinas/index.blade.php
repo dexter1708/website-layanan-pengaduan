@@ -57,7 +57,7 @@
         $('#tablePendampingan').DataTable({
             responsive: true,
             order: [],
-            columnDefs: [{ orderable: false, targets: [7] }],
+            columnDefs: [{ orderable: false, targets: [8] }],
             language: {
                 search: "Cari:",
                 lengthMenu: "Tampilkan _MENU_ entri",
@@ -114,6 +114,7 @@
                     <th class="p-3 whitespace-nowrap">Tempat Pendampingan</th>
                     <th class="p-3 whitespace-nowrap">Jenis Pelayanan</th>
                     <th class="p-3 whitespace-nowrap">Status</th>
+                    <th class="p-3 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
             <tbody class="text-center text-gray-800">
@@ -153,22 +154,22 @@
                         <td class="p-3 whitespace-nowrap">{{ $pendampingan->tempat_pendampingan }}</td>
                         <td class="p-3 whitespace-nowrap">{{ $pendampingan->jenis_layanan }}</td>
                         <td class="p-3 whitespace-nowrap">
-                            <div class="flex items-center justify-center gap-2">
-                                <span class="w-36 text-center px-3 py-1 rounded text-xs font-semibold {{ $badge }}">
-                                    {{ $statusLabel }}
-                                </span>
-                                <a href="{{ $link }}" class="bg-blue-500 p-2 rounded hover:bg-blue-600" title="Lihat Detail">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <circle cx="11" cy="11" r="8"/>
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                                    </svg>
-                                </a>
-                            </div>
+                            <span class="w-36 text-center px-3 py-1 rounded text-xs font-semibold {{ $badge }}">
+                                {{ $statusLabel }}
+                            </span>
+                        </td>
+                        <td class="p-3 whitespace-nowrap">
+                            <a href="{{ $link }}" class="bg-blue-500 p-2 rounded hover:bg-blue-600" title="Lihat Detail">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                            </a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="p-3 whitespace-nowrap text-center text-gray-500">
+                        <td colspan="9" class="p-3 whitespace-nowrap text-center text-gray-500">
                             Tidak ada data pendampingan
                         </td>
                     </tr>

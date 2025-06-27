@@ -16,9 +16,20 @@
     </nav>
 
     @if($pengaduans->isEmpty())
-        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md shadow-md" role="alert">
-            <p class="font-bold">Informasi</p>
-            <p>Saat ini Anda tidak memiliki pengaduan yang dapat diajukan untuk layanan konseling. Semua pengaduan Anda mungkin sudah memiliki jadwal konseling.</p>
+        <br>
+        <div class="flex items-center justify-center min-h-[300px]">
+            <div class="bg-yellow-50 border border-yellow-300 text-yellow-800 rounded-lg shadow p-6 max-w-xl w-full text-center">
+                <div class="font-bold mb-2 text-lg flex items-center justify-center gap-2">
+                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/>
+                    </svg>
+                    Informasi
+                </div>
+                <div>
+                    Saat ini Anda tidak memiliki pengaduan yang dapat diajukan untuk layanan konseling.<br>
+                    Semua pengaduan Anda mungkin sudah memiliki jadwal konseling.
+                </div>
+            </div>
         </div>
     @else
         @if($errors->any())
